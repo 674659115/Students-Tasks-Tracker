@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import '../localization/app_localizations.dart';
 import '../theme/app_theme.dart';
+import '../widgets/auth_quick_header.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/primary_button.dart';
 import 'forgot_password_phone_screen.dart';
@@ -17,135 +19,121 @@ class _ForgotPasswordEmailScreenState extends State<ForgotPasswordEmailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Back Button
-              GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.06),
-                        blurRadius: 8,
+    return ValueListenableBuilder<String>(
+      valueListenable: languageNotifier,
+      builder: (context, currentLang, child) {
+        final isDark = AppColors.isDarkMode(context);
+
+        return Scaffold(
+          backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+          body: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const AuthQuickHeader(),
+                  const SizedBox(height: 20),
+
+                  // Lock Icon Header
+                  Center(
+                    child: Container(
+                      width: 90,
+                      height: 90,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF1E67C6),
+                        shape: BoxShape.circle,
                       ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.arrow_back,
-                    color: AppColors.textDark,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 30),
-
-              // Lock Icon Header
-              Center(
-                child: Container(
-                  width: 100,
-                  height: 100,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF1E67C6),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.lock_outline_rounded,
-                    color: Colors.white,
-                    size: 50,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Title
-              const Center(
-                child: Text(
-                  'Forgot Password?',
-                  style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-
-              // Subtitle
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.0),
-                child: Text(
-                  "Don't worry! We will send you the reset instruction!",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Color(0xFF6B7280),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 30),
-
-              // Email Input
-              CustomTextField(
-                label: 'Email Address',
-                hintText: 'SirWilliam@gmail.com',
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-              ),
-              const SizedBox(height: 30),
-
-              // Send Code Button
-              PrimaryButton(
-                text: 'Send Code',
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => OTPVerificationScreen(
-                        targetAddress: _emailController.text,
-                        isEmail: true,
+                      child: const Icon(
+                        Icons.lock_outline_rounded,
+                        color: Colors.white,
+                        size: 46,
                       ),
                     ),
-                  );
-                },
-              ),
-              const SizedBox(height: 20),
+                  ),
+                  const SizedBox(height: 20),
 
-              // Try another method link
-              Center(
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ForgotPasswordPhoneScreen(),
+                  // Title
+                  Center(
+                    child: Text(
+                      AppStrings.get('forgot_password_title'),
+                      style: const TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primary,
                       ),
-                    );
-                  },
-                  child: const Text(
-                    'Try another method?',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF8B5CF6),
                     ),
                   ),
-                ),
+                  const SizedBox(height: 10),
+
+                  // Subtitle
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Text(
+                      AppStrings.get('forgot_password_subtitle'),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: isDark ? AppColors.textMutedDark : const Color(0xFF6B7280),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 28),
+
+                  // Email Input
+                  CustomTextField(
+                    label: AppStrings.get('email_address'),
+                    hintText: 'SirWilliam@gmail.com',
+                    controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                  const SizedBox(height: 28),
+
+                  // Send Code Button
+                  PrimaryButton(
+                    text: AppStrings.get('send_code'),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => OTPVerificationScreen(
+                            targetAddress: _emailController.text,
+                            isEmail: true,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Try another method link
+                  Center(
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ForgotPasswordPhoneScreen(),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        AppStrings.get('try_another_method'),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF8B5CF6),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

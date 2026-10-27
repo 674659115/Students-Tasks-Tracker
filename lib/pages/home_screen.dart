@@ -400,7 +400,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 4),
                 RichText(
                   text: TextSpan(
-                    text: '${task.dueText} | ',
+                    text: '${formatFriendlyDate(task.dueDate)} | ',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
