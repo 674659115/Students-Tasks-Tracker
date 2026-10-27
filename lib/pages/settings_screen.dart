@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../localization/app_localizations.dart';
 import '../theme/app_theme.dart';
+import '../widgets/help_faqs_modal.dart';
 import 'reset_password_screen.dart';
 import 'sign_in_screen.dart';
 
@@ -322,94 +323,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  void _showHelpModal(bool isDark) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: isDark ? AppColors.cardBgDark : Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      builder: (context) {
-        return Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade400,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                AppStrings.get('help_faqs'),
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? AppColors.textLight : AppColors.textDark,
-                ),
-              ),
-              const SizedBox(height: 16),
-              _buildFaqItem(
-                'How do I add a new task?',
-                'Tap the orange + button on the Home tab. Enter the task title, select your course, choose a due date and priority level, then tap Create Task.',
-                isDark,
-              ),
-              _buildFaqItem(
-                'How do I add deadlines to the Calendar?',
-                'Go to the Calendar tab and tap "+ Add Event". You can choose any day of the month, title, and priority to show a deadline dot on the grid.',
-                isDark,
-              ),
-              _buildFaqItem(
-                'How do I track course progress?',
-                'Visit the Courses tab to view progress bars, assignment completions, and test metrics for all your enrolled subjects.',
-                isDark,
-              ),
-              _buildFaqItem(
-                'Can I delete tasks or calendar items?',
-                'Yes! Every task card on Home and deadline card on Calendar features a red trash icon. Tapping it instantly removes the item.',
-                isDark,
-              ),
-              const SizedBox(height: 20),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildFaqItem(String question, String answer, bool isDark) {
-    return ExpansionTile(
-      title: Text(
-        question,
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          color: isDark ? AppColors.textLight : AppColors.textDark,
-          fontSize: 15,
-        ),
-      ),
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Text(
-            answer,
-            style: TextStyle(
-              color: isDark ? AppColors.textMutedDark : AppColors.textMuted,
-              fontSize: 14,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
   void _showAboutDialog(bool isDark) {
     showAboutDialog(
       context: context,
@@ -659,7 +572,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       icon: Icons.help_outline_rounded,
                       title: AppStrings.get('help_faqs'),
                       subtitle: 'Get assistance and answers',
-                      onTap: () => _showHelpModal(isDark),
+                      onTap: () => showHelpFaqsModal(context),
                     ),
                     _buildSettingsTile(
                       isDark: isDark,

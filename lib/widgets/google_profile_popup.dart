@@ -3,6 +3,7 @@ import '../localization/app_localizations.dart';
 import '../pages/settings_screen.dart';
 import '../pages/sign_in_screen.dart';
 import '../theme/app_theme.dart';
+import 'help_faqs_modal.dart';
 
 void showGoogleProfilePopup(BuildContext context) {
   showDialog(
@@ -249,7 +250,10 @@ class _GoogleProfilePopupDialogState extends State<GoogleProfilePopupDialog> {
                     isDark: isDark,
                     icon: Icons.help_outline_rounded,
                     title: AppStrings.get('help_faqs'),
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.pop(context);
+                      showHelpFaqsModal(context);
+                    },
                   ),
 
                   const SizedBox(height: 8),
@@ -316,7 +320,7 @@ class _GoogleProfilePopupDialogState extends State<GoogleProfilePopupDialog> {
                 title,
                 style: TextStyle(
                   fontSize: 15,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.bold,
                   color: effectiveTextColor,
                 ),
               ),
