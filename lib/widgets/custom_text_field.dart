@@ -28,6 +28,10 @@ class _CustomTextFieldState extends State<CustomTextField> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = AppColors.isDarkMode(context);
+    final cardBg = isDark ? AppColors.cardBgDark : Colors.white;
+    final textPrimary = isDark ? AppColors.textLight : AppColors.textDark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -42,7 +46,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: cardBg,
             borderRadius: BorderRadius.circular(30),
             boxShadow: [
               BoxShadow(
@@ -56,7 +60,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
             controller: widget.controller,
             obscureText: widget.isPassword ? _obscureText : false,
             keyboardType: widget.keyboardType,
-            style: const TextStyle(fontSize: 15, color: AppColors.textDark),
+            style: TextStyle(fontSize: 15, color: textPrimary),
             decoration: InputDecoration(
               hintText: widget.hintText,
               hintStyle: const TextStyle(color: Color(0xFFA0AEC0)),

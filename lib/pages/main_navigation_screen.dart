@@ -6,6 +6,7 @@ import 'home_screen.dart';
 import 'courses_screen.dart';
 import 'calendar_screen.dart';
 import 'analytical_screen.dart';
+import 'add_task_dialog.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
@@ -20,19 +21,19 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   final List<TaskModel> _tasks = [
     TaskModel(
       id: '1',
-      title: 'IoT & Mobile App',
+      title: 'IoT & Mobile App Project',
       course: 'IoT & Mobile App',
-      dueText: 'Due Tomorrow 23:59',
-      dueDate: DateTime.now().add(const Duration(days: 1)),
+      dueText: formatFriendlyDate(DateTime.now()),
+      dueDate: DateTime.now(),
       priority: TaskPriority.high,
       courseColor: AppColors.courseBlue,
-      isCompleted: true,
+      isCompleted: false,
     ),
     TaskModel(
       id: '2',
-      title: 'Eng A+',
+      title: 'Eng A+ Essay Submission',
       course: 'Eng A+',
-      dueText: 'Due Today 23:59',
+      dueText: formatFriendlyDate(DateTime.now()),
       dueDate: DateTime.now(),
       priority: TaskPriority.medium,
       courseColor: AppColors.courseOrange,
@@ -40,29 +41,29 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     ),
     TaskModel(
       id: '3',
-      title: 'Control System',
+      title: 'Control System Homework 3',
       course: 'Control System',
-      dueText: 'Due Fri 13:00',
-      dueDate: DateTime.now().add(const Duration(days: 4)),
+      dueText: formatFriendlyDate(DateTime.now()),
+      dueDate: DateTime.now(),
       priority: TaskPriority.low,
       courseColor: AppColors.courseGreen,
-      isCompleted: true,
+      isCompleted: false,
     ),
     TaskModel(
       id: '4',
-      title: 'Electronics Engineering',
+      title: 'Electronics Lab Preparation',
       course: 'Electronics Engineering',
-      dueText: 'Due Thu 16:00',
-      dueDate: DateTime.now().add(const Duration(days: 3)),
+      dueText: formatFriendlyDate(DateTime.now().add(const Duration(days: 2))),
+      dueDate: DateTime.now().add(const Duration(days: 2)),
       priority: TaskPriority.medium,
       courseColor: AppColors.courseBrown,
-      isCompleted: true,
+      isCompleted: false,
     ),
   ];
 
   void _addNewTask(TaskModel newTask) {
     setState(() {
-      _tasks.add(newTask);
+      _tasks.insert(0, newTask);
     });
   }
 
@@ -73,13 +74,22 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     });
   }
 
+  void _deleteTask(String taskId) {
+    setState(() {
+      _tasks.removeWhere((t) => t.id == taskId);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isDark = AppColors.isDarkMode(context);
+
     final List<Widget> pages = [
       HomeScreen(
         tasks: _tasks,
         onTaskAdded: _addNewTask,
         onTaskToggled: _toggleTask,
+        onTaskDeleted: _deleteTask,
       ),
       const CoursesScreen(),
       const CalendarScreen(),
@@ -87,7 +97,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     ];
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       body: IndexedStack(
         index: _currentIndex,
         children: pages,

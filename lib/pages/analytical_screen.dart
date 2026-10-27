@@ -9,8 +9,12 @@ class AnalyticalScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = AppColors.isDarkMode(context);
+    final cardBg = isDark ? AppColors.cardBgDark : Colors.white;
+    final textPrimary = isDark ? AppColors.textLight : const Color(0xFF0F172A);
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.only(bottom: 90),
@@ -26,7 +30,7 @@ class AnalyticalScreen extends StatelessWidget {
                 width: double.infinity,
                 margin: const EdgeInsets.symmetric(horizontal: 20),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: cardBg,
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
@@ -71,30 +75,34 @@ class AnalyticalScreen extends StatelessWidget {
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children: const [
+                              children: [
                                 Text(
                                   'App & Account Settings',
                                   style: TextStyle(
                                     fontSize: 17,
                                     fontWeight: FontWeight.bold,
-                                    color: Color(0xFF0F172A),
+                                    color: textPrimary,
                                   ),
                                 ),
-                                SizedBox(height: 2),
+                                const SizedBox(height: 2),
                                 Text(
                                   'Manage password, notifications & preferences',
                                   style: TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w500,
-                                    color: Color(0xFF64748B),
+                                    color: isDark
+                                        ? AppColors.textMutedDark
+                                        : const Color(0xFF64748B),
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                          const Icon(
+                          Icon(
                             Icons.chevron_right_rounded,
-                            color: Color(0xFF94A3B8),
+                            color: isDark
+                                ? AppColors.textMutedDark
+                                : const Color(0xFF94A3B8),
                             size: 28,
                           ),
                         ],
@@ -111,7 +119,7 @@ class AnalyticalScreen extends StatelessWidget {
                 margin: const EdgeInsets.symmetric(horizontal: 20),
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: cardBg,
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
@@ -123,23 +131,23 @@ class AnalyticalScreen extends StatelessWidget {
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
                       'TASK COMPLETION RATE',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 0.5,
-                        color: Color(0xFF0F172A),
+                        color: textPrimary,
                       ),
                     ),
-                    SizedBox(height: 12),
+                    const SizedBox(height: 12),
                     Text(
                       '70%',
                       style: TextStyle(
                         fontSize: 48,
                         fontWeight: FontWeight.w900,
-                        color: Color(0xFF0F172A),
+                        color: textPrimary,
                       ),
                     ),
                   ],
@@ -153,7 +161,7 @@ class AnalyticalScreen extends StatelessWidget {
                 margin: const EdgeInsets.symmetric(horizontal: 20),
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: cardBg,
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
@@ -165,18 +173,18 @@ class AnalyticalScreen extends StatelessWidget {
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
                       'WEEKLY PRODUCTIVITY',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 0.5,
-                        color: Color(0xFF0F172A),
+                        color: textPrimary,
                       ),
                     ),
-                    SizedBox(height: 16),
-                    WeeklyProductivityChart(),
+                    const SizedBox(height: 16),
+                    const WeeklyProductivityChart(),
                   ],
                 ),
               ),
@@ -188,7 +196,7 @@ class AnalyticalScreen extends StatelessWidget {
                 margin: const EdgeInsets.symmetric(horizontal: 20),
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: cardBg,
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
@@ -200,18 +208,18 @@ class AnalyticalScreen extends StatelessWidget {
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
                       'TASK BY COURSE',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 0.5,
-                        color: Color(0xFF0F172A),
+                        color: textPrimary,
                       ),
                     ),
-                    SizedBox(height: 20),
-                    TaskByCoursePieChart(),
+                    const SizedBox(height: 20),
+                    const TaskByCoursePieChart(),
                   ],
                 ),
               ),

@@ -5,16 +5,60 @@ import '../widgets/header_bar.dart';
 import '../widgets/charts.dart';
 import 'add_task_dialog.dart';
 
+String formatHeaderDate() {
+  final now = DateTime.now();
+  final daysOfWeek = [
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+    'Sunday'
+  ];
+  final months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec'
+  ];
+
+  String dayName = daysOfWeek[now.weekday - 1];
+  String monthName = months[now.month - 1];
+
+  int day = now.day;
+  String suffix = 'th';
+  if (day == 1 || day == 21 || day == 31) {
+    suffix = 'st';
+  } else if (day == 2 || day == 22) {
+    suffix = 'nd';
+  } else if (day == 3 || day == 23) {
+    suffix = 'rd';
+  }
+
+  return '$dayName, $monthName $day$suffix';
+}
+
 class HomeScreen extends StatefulWidget {
   final List<TaskModel> tasks;
   final Function(TaskModel) onTaskAdded;
   final Function(String) onTaskToggled;
+  final Function(String) onTaskDeleted;
 
   const HomeScreen({
     super.key,
     required this.tasks,
     required this.onTaskAdded,
     required this.onTaskToggled,
+    required this.onTaskDeleted,
   });
 
   @override
@@ -22,12 +66,33 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  bool _isSameDay(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
+  }
+
   @override
   Widget build(BuildContext context) {
-    int completedCount = widget.tasks.where((t) => t.isCompleted).length;
+    final isDark = AppColors.isDarkMode(context);
+    final cardBg = isDark ? AppColors.cardBgDark : Colors.white;
+    final textPrimary = isDark ? AppColors.textLight : const Color(0xFF0F172A);
+
+    // TODAY TASKS Calculations
+    final now = DateTime.now();
+    final todayTasks =
+        widget.tasks.where((t) => _isSameDay(t.dueDate, now)).toList();
+    final todayCompleted = todayTasks.where((t) => t.isCompleted).length;
+    final todayTotal = todayTasks.length;
+    final todayProgress =
+        todayTotal == 0 ? 0.0 : (todayCompleted / todayTotal);
+
+    // WEEKLY / TOTAL TASKS Calculations
+    final weeklyCompleted = widget.tasks.where((t) => t.isCompleted).length;
+    final weeklyTotal = widget.tasks.length;
+    final weeklyProgress =
+        weeklyTotal == 0 ? 0.0 : (weeklyCompleted / weeklyTotal);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       body: SafeArea(
         child: Stack(
           children: [
@@ -37,8 +102,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Top Header
-                  const HeaderBar(
-                    subtitle: 'Monday, Sep 7th',
+                  HeaderBar(
+                    subtitle: formatHeaderDate(),
                     title: 'Welcome, User!',
                   ),
                   const SizedBox(height: 12),
@@ -51,23 +116,27 @@ class _HomeScreenState extends State<HomeScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       children: [
                         _buildStatCard(
+                          context: context,
                           title: 'TODAY TASKS',
-                          completed: completedCount > 0 ? 1 : 0,
-                          total: 3,
-                          progress: 0.33,
+                          completed: todayCompleted,
+                          total: todayTotal,
+                          progress: todayProgress,
                           activeColor: const Color(0xFF3B82F6),
                           activeSecondaryColor: const Color(0xFFA855F7),
+                          cardBg: cardBg,
+                          textPrimary: textPrimary,
                         ),
                         const SizedBox(width: 14),
                         _buildStatCard(
+                          context: context,
                           title: 'WEEKLY TASKS',
-                          completed: completedCount,
-                          total: widget.tasks.length,
-                          progress: widget.tasks.isEmpty
-                              ? 0
-                              : completedCount / widget.tasks.length,
+                          completed: weeklyCompleted,
+                          total: weeklyTotal,
+                          progress: weeklyProgress,
                           activeColor: const Color(0xFF3B82F6),
                           activeSecondaryColor: const Color(0xFFE07A48),
+                          cardBg: cardBg,
+                          textPrimary: textPrimary,
                         ),
                       ],
                     ),
@@ -75,31 +144,50 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 24),
 
                   // MY TASKS Header
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Text(
                       'MY TASKS',
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 0.5,
-                        color: Color(0xFF0F172A),
+                        color: textPrimary,
                       ),
                     ),
                   ),
                   const SizedBox(height: 12),
 
                   // Task Cards List
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    itemCount: widget.tasks.length,
-                    itemBuilder: (context, index) {
-                      final task = widget.tasks[index];
-                      return _buildTaskCard(task);
-                    },
-                  ),
+                  if (widget.tasks.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 30,
+                      ),
+                      child: Center(
+                        child: Text(
+                          'No tasks yet! Click + to create one.',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: isDark
+                                ? AppColors.textMutedDark
+                                : AppColors.textMuted,
+                          ),
+                        ),
+                      ),
+                    )
+                  else
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      itemCount: widget.tasks.length,
+                      itemBuilder: (context, index) {
+                        final task = widget.tasks[index];
+                        return _buildTaskCard(task, cardBg, textPrimary, isDark);
+                      },
+                    ),
                 ],
               ),
             ),
@@ -148,18 +236,21 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildStatCard({
+    required BuildContext context,
     required String title,
     required int completed,
     required int total,
     required double progress,
     required Color activeColor,
     required Color activeSecondaryColor,
+    required Color cardBg,
+    required Color textPrimary,
   }) {
     return Container(
       width: 175,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardBg,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -178,10 +269,10 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w900,
-                    color: Color(0xFF0F172A),
+                    color: textPrimary,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -194,12 +285,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       color: Color(0xFF3B82F6),
                     ),
                     children: [
-                      const TextSpan(
+                      TextSpan(
                         text: 'OUT\nOF ',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w900,
-                          color: Color(0xFF0F172A),
+                          color: textPrimary,
                         ),
                       ),
                       TextSpan(
@@ -235,7 +326,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildTaskCard(TaskModel task) {
+  Widget _buildTaskCard(
+      TaskModel task, Color cardBg, Color textPrimary, bool isDark) {
     Color priorityColor;
     switch (task.priority) {
       case TaskPriority.low:
@@ -253,7 +345,7 @@ class _HomeScreenState extends State<HomeScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardBg,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -272,12 +364,12 @@ class _HomeScreenState extends State<HomeScreen> {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: task.isCompleted ? task.courseColor : task.courseColor,
+                color: task.courseColor,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Center(
                 child: Icon(
-                  task.isCompleted ? Icons.check_box : Icons.check_rounded,
+                  task.isCompleted ? Icons.check_box : Icons.check_box_outline_blank_rounded,
                   color: Colors.white,
                   size: 28,
                 ),
@@ -285,6 +377,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const SizedBox(width: 14),
+
           // Task Title & Due Date
           Expanded(
             child: Column(
@@ -293,9 +386,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 Text(
                   task.title,
                   style: TextStyle(
-                    fontSize: 17,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: task.courseColor,
+                    color: task.isCompleted
+                        ? (isDark ? AppColors.textMutedDark : const Color(0xFF94A3B8))
+                        : task.courseColor,
                     decoration: task.isCompleted
                         ? TextDecoration.lineThrough
                         : TextDecoration.none,
@@ -305,10 +400,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 RichText(
                   text: TextSpan(
                     text: '${task.dueText} | ',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF94A3B8),
+                      color: isDark ? AppColors.textMutedDark : const Color(0xFF94A3B8),
                     ),
                     children: [
                       TextSpan(
@@ -324,6 +419,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
+          ),
+
+          // Delete Task Button
+          IconButton(
+            icon: const Icon(
+              Icons.delete_outline_rounded,
+              color: Colors.redAccent,
+              size: 24,
+            ),
+            onPressed: () {
+              widget.onTaskDeleted(task.id);
+            },
           ),
         ],
       ),

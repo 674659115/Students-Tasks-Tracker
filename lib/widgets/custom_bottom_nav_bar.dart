@@ -13,10 +13,13 @@ class CustomBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = AppColors.isDarkMode(context);
+    final cardBg = isDark ? AppColors.cardBgDark : Colors.white;
+
     return Container(
       height: 72,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardBg,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.06),
@@ -29,21 +32,25 @@ class CustomBottomNavBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _buildNavItem(
+            context: context,
             index: 0,
             icon: Icons.home,
             label: 'Home',
           ),
           _buildNavItem(
+            context: context,
             index: 1,
             icon: Icons.folder_copy_outlined,
             label: 'Courses',
           ),
           _buildNavItem(
+            context: context,
             index: 2,
             icon: Icons.calendar_today_outlined,
             label: 'Calendar',
           ),
           _buildNavItem(
+            context: context,
             index: 3,
             icon: Icons.person,
             label: 'Profile',
@@ -54,13 +61,15 @@ class CustomBottomNavBar extends StatelessWidget {
   }
 
   Widget _buildNavItem({
+    required BuildContext context,
     required int index,
     required IconData icon,
     required String label,
   }) {
     final bool isSelected = currentIndex == index;
-    final Color activeColor = AppColors.primary;
-    final Color inactiveColor = const Color(0xFF94A3B8);
+    final isDark = AppColors.isDarkMode(context);
+    final Color activeColor = isDark ? AppColors.primaryDark : AppColors.primary;
+    final Color inactiveColor = isDark ? AppColors.textMutedDark : const Color(0xFF94A3B8);
 
     return InkWell(
       onTap: () => onTap(index),

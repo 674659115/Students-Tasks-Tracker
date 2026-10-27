@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
 import 'google_profile_popup.dart';
 
 class HeaderBar extends StatelessWidget {
@@ -13,6 +14,10 @@ class HeaderBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = AppColors.isDarkMode(context);
+    final cardBg = isDark ? AppColors.cardBgDark : Colors.white;
+    final textPrimary = isDark ? AppColors.textLight : const Color(0xFF0F172A);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       child: Row(
@@ -25,21 +30,21 @@ class HeaderBar extends StatelessWidget {
               if (subtitle != null) ...[
                 Text(
                   subtitle!,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF94A3B8),
+                    color: isDark ? AppColors.textMutedDark : const Color(0xFF94A3B8),
                   ),
                 ),
                 const SizedBox(height: 2),
               ],
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 0.5,
-                  color: Color(0xFF0F172A),
+                  color: textPrimary,
                 ),
               ),
             ],
@@ -51,7 +56,7 @@ class HeaderBar extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: cardBg,
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
@@ -65,10 +70,10 @@ class HeaderBar extends StatelessWidget {
                   children: [
                     Stack(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.notifications_none_outlined,
                           size: 24,
-                          color: Color(0xFF1E293B),
+                          color: textPrimary,
                         ),
                         Positioned(
                           right: 1,
@@ -85,10 +90,10 @@ class HeaderBar extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(width: 4),
-                    const Icon(
+                    Icon(
                       Icons.keyboard_arrow_down,
                       size: 20,
-                      color: Color(0xFF64748B),
+                      color: isDark ? AppColors.textMutedDark : const Color(0xFF64748B),
                     ),
                   ],
                 ),
@@ -102,7 +107,10 @@ class HeaderBar extends StatelessWidget {
                   height: 42,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2),
+                    border: Border.all(
+                      color: isDark ? AppColors.cardBgDark : Colors.white,
+                      width: 2,
+                    ),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withValues(alpha: 0.1),

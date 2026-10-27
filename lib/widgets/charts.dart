@@ -1,12 +1,13 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
 
 // --- Donut Chart Widget ---
 class DonutProgressChart extends StatelessWidget {
   final double progress; // 0.0 to 1.0
   final Color activeColor;
   final Color activeSecondaryColor;
-  final Color backgroundColor;
+  final Color? backgroundColor;
   final double size;
 
   const DonutProgressChart({
@@ -14,12 +15,16 @@ class DonutProgressChart extends StatelessWidget {
     required this.progress,
     this.activeColor = const Color(0xFF3B82F6),
     this.activeSecondaryColor = const Color(0xFFA855F7),
-    this.backgroundColor = const Color(0xFFE2E8F0),
+    this.backgroundColor,
     this.size = 64,
   });
 
   @override
   Widget build(BuildContext context) {
+    final isDark = AppColors.isDarkMode(context);
+    final effectiveBg = backgroundColor ??
+        (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0));
+
     return SizedBox(
       width: size,
       height: size,
@@ -28,7 +33,7 @@ class DonutProgressChart extends StatelessWidget {
           progress: progress,
           activeColor: activeColor,
           activeSecondaryColor: activeSecondaryColor,
-          backgroundColor: backgroundColor,
+          backgroundColor: effectiveBg,
         ),
       ),
     );
@@ -107,22 +112,24 @@ class WeeklyProductivityChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = AppColors.isDarkMode(context);
+
     return Column(
       children: [
         // Legend
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _buildLegendItem(const Color(0xFF3B82F6), 'On-Time Submission'),
+            _buildLegendItem(const Color(0xFF3B82F6), 'On-Time Submission', isDark),
             const SizedBox(width: 12),
-            _buildLegendItem(const Color(0xFFFFD54F), 'Late Submission'),
+            _buildLegendItem(const Color(0xFFFFD54F), 'Late Submission', isDark),
           ],
         ),
         const SizedBox(height: 6),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _buildLegendItem(const Color(0xFFC63D2F), 'Not Submitted'),
+            _buildLegendItem(const Color(0xFFC63D2F), 'Not Submitted', isDark),
           ],
         ),
         const SizedBox(height: 16),
@@ -131,14 +138,14 @@ class WeeklyProductivityChart extends StatelessWidget {
           height: 140,
           child: CustomPaint(
             size: const Size(double.infinity, 140),
-            painter: StackedBarChartPainter(),
+            painter: StackedBarChartPainter(isDark: isDark),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildLegendItem(Color color, String label) {
+  Widget _buildLegendItem(Color color, String label, bool isDark) {
     return Row(
       children: [
         Container(
@@ -149,10 +156,10 @@ class WeeklyProductivityChart extends StatelessWidget {
         const SizedBox(width: 6),
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF1E293B),
+            color: isDark ? AppColors.textLight : const Color(0xFF1E293B),
           ),
         ),
       ],
@@ -161,6 +168,10 @@ class WeeklyProductivityChart extends StatelessWidget {
 }
 
 class StackedBarChartPainter extends CustomPainter {
+  final bool isDark;
+
+  StackedBarChartPainter({required this.isDark});
+
   @override
   void paint(Canvas canvas, Size size) {
     final double leftPadding = 35.0;
@@ -168,15 +179,14 @@ class StackedBarChartPainter extends CustomPainter {
     final double chartWidth = size.width - leftPadding;
     final double chartHeight = size.height - bottomPadding;
 
-    // Y-Axis grid lines & labels (0, 20, 40, 60, 80, 100)
-    final textStyle = const TextStyle(
+    final textStyle = TextStyle(
       fontSize: 11,
       fontWeight: FontWeight.w500,
-      color: Color(0xFF475569),
+      color: isDark ? AppColors.textMutedDark : const Color(0xFF475569),
     );
 
     final linePaint = Paint()
-      ..color = const Color(0xFFE2E8F0)
+      ..color = isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)
       ..strokeWidth = 1.0;
 
     for (int i = 0; i <= 5; i++) {
@@ -200,7 +210,6 @@ class StackedBarChartPainter extends CustomPainter {
 
     // Days & Bar Data
     final days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
-    // Data per day: [On-time %, Late %, Not-submitted %]
     final data = [
       [65.0, 20.0, 15.0],
       [60.0, 25.0, 15.0],
@@ -222,7 +231,6 @@ class StackedBarChartPainter extends CustomPainter {
       double groupLeft = leftPadding + (i * groupWidth);
       double barLeft = groupLeft + (groupWidth - barWidth) / 2;
 
-      // Draw Stacked Segments
       double currentY = chartHeight;
 
       RRect totalBarRRect = RRect.fromRectAndRadius(

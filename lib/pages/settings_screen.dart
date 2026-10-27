@@ -12,12 +12,13 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _pushNotifications = true;
-  bool _darkMode = false;
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = themeNotifier.value == ThemeMode.dark;
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
@@ -33,7 +34,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       width: 44,
                       height: 44,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: isDark ? AppColors.cardBgDark : Colors.white,
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
@@ -42,19 +43,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                         ],
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.arrow_back,
-                        color: AppColors.textDark,
+                        color: isDark ? AppColors.textLight : AppColors.textDark,
                       ),
                     ),
                   ),
                   const SizedBox(width: 16),
-                  const Text(
+                  Text(
                     'Settings',
                     style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.w900,
-                      color: Color(0xFF0F172A),
+                      color: isDark ? AppColors.textLight : const Color(0xFF0F172A),
                     ),
                   ),
                 ],
@@ -65,7 +66,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isDark ? AppColors.cardBgDark : Colors.white,
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
@@ -96,22 +97,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
+                        children: [
                           Text(
                             'Sir William',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF0F172A),
+                              color: isDark
+                                  ? AppColors.textLight
+                                  : const Color(0xFF0F172A),
                             ),
                           ),
-                          SizedBox(height: 2),
+                          const SizedBox(height: 2),
                           Text(
                             'SirWilliam@gmail.com',
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w500,
-                              color: Color(0xFF64748B),
+                              color: isDark
+                                  ? AppColors.textMutedDark
+                                  : const Color(0xFF64748B),
                             ),
                           ),
                         ],
@@ -123,7 +128,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.background,
+                        color: isDark
+                            ? AppColors.backgroundDark
+                            : AppColors.background,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: const Text(
@@ -141,10 +148,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(height: 24),
 
               // Section 1: Account & Security
-              _buildSectionTitle('ACCOUNT & SECURITY'),
+              _buildSectionTitle('ACCOUNT & SECURITY', isDark),
               const SizedBox(height: 10),
               _buildSettingsGroup([
                 _buildSettingsTile(
+                  isDark: isDark,
                   icon: Icons.lock_outline_rounded,
                   title: 'Change Password',
                   subtitle: 'Update your security credentials',
@@ -158,19 +166,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   },
                 ),
                 _buildSettingsTile(
+                  isDark: isDark,
                   icon: Icons.shield_outlined,
                   title: 'Privacy & Permissions',
                   subtitle: 'Manage data & account privacy',
                   onTap: () {},
                 ),
-              ]),
+              ], isDark),
               const SizedBox(height: 24),
 
               // Section 2: Preferences
-              _buildSectionTitle('APP PREFERENCES'),
+              _buildSectionTitle('APP PREFERENCES', isDark),
               const SizedBox(height: 10),
               _buildSettingsGroup([
                 _buildSettingsTile(
+                  isDark: isDark,
                   icon: Icons.notifications_none_outlined,
                   title: 'Push Notifications',
                   subtitle: 'Deadline reminders & task alerts',
@@ -190,50 +200,56 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   },
                 ),
                 _buildSettingsTile(
+                  isDark: isDark,
                   icon: Icons.dark_mode_outlined,
                   title: 'Dark Theme',
                   subtitle: 'Toggle dark mode layout',
                   trailing: Switch.adaptive(
-                    value: _darkMode,
+                    value: isDark,
                     activeTrackColor: AppColors.primary,
                     onChanged: (val) {
                       setState(() {
-                        _darkMode = val;
+                        themeNotifier.value =
+                            val ? ThemeMode.dark : ThemeMode.light;
                       });
                     },
                   ),
                   onTap: () {
                     setState(() {
-                      _darkMode = !_darkMode;
+                      themeNotifier.value =
+                          isDark ? ThemeMode.light : ThemeMode.dark;
                     });
                   },
                 ),
                 _buildSettingsTile(
+                  isDark: isDark,
                   icon: Icons.language_outlined,
                   title: 'Language',
                   subtitle: 'English (US)',
                   onTap: () {},
                 ),
-              ]),
+              ], isDark),
               const SizedBox(height: 24),
 
               // Section 3: Help & Info
-              _buildSectionTitle('SUPPORT & ABOUT'),
+              _buildSectionTitle('SUPPORT & ABOUT', isDark),
               const SizedBox(height: 10),
               _buildSettingsGroup([
                 _buildSettingsTile(
+                  isDark: isDark,
                   icon: Icons.help_outline_rounded,
                   title: 'Help & FAQs',
                   subtitle: 'Get assistance and answers',
                   onTap: () {},
                 ),
                 _buildSettingsTile(
+                  isDark: isDark,
                   icon: Icons.info_outline_rounded,
                   title: 'About Students Task Tracker',
                   subtitle: 'Version 1.0.0 (Build 1)',
                   onTap: () {},
                 ),
-              ]),
+              ], isDark),
               const SizedBox(height: 28),
 
               // Sign Out Button
@@ -276,22 +292,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(String title, bool isDark) {
     return Text(
       title,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 13,
         fontWeight: FontWeight.w900,
         letterSpacing: 0.8,
-        color: Color(0xFF64748B),
+        color: isDark ? AppColors.textMutedDark : const Color(0xFF64748B),
       ),
     );
   }
 
-  Widget _buildSettingsGroup(List<Widget> children) {
+  Widget _buildSettingsGroup(List<Widget> children, bool isDark) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? AppColors.cardBgDark : Colors.white,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
@@ -308,6 +324,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _buildSettingsTile({
+    required bool isDark,
     required IconData icon,
     required String title,
     required String subtitle,
@@ -324,7 +341,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: AppColors.background,
+                color: isDark
+                    ? AppColors.backgroundDark
+                    : AppColors.background,
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Icon(icon, color: AppColors.primary, size: 22),
@@ -336,19 +355,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF0F172A),
+                      color: isDark
+                          ? AppColors.textLight
+                          : const Color(0xFF0F172A),
                     ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     subtitle,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: Color(0xFF64748B),
+                      color: isDark
+                          ? AppColors.textMutedDark
+                          : const Color(0xFF64748B),
                     ),
                   ),
                 ],
@@ -357,9 +380,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             if (trailing != null)
               trailing
             else
-              const Icon(
+              Icon(
                 Icons.chevron_right_rounded,
-                color: Color(0xFF94A3B8),
+                color: isDark
+                    ? AppColors.textMutedDark
+                    : const Color(0xFF94A3B8),
               ),
           ],
         ),

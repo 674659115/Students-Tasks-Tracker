@@ -3,72 +3,237 @@ import '../models/course_model.dart';
 import '../theme/app_theme.dart';
 import '../widgets/header_bar.dart';
 
-class CoursesScreen extends StatelessWidget {
+class CoursesScreen extends StatefulWidget {
   const CoursesScreen({super.key});
 
-  List<CourseModel> get _sampleCourses => [
-        CourseModel(
-          id: '1',
-          name: 'IoT & Mobile\nApp',
-          completedAssignments: 7,
-          totalAssignments: 10,
-          completedTests: 1,
-          totalTests: 2,
-          themeColor: const Color(0xFF1D61E7),
-        ),
-        CourseModel(
-          id: '2',
-          name: 'Eng A+',
-          classId: 'Class ID: 1u34t',
-          completedAssignments: 8,
-          totalAssignments: 11,
-          completedTests: 2,
-          totalTests: 3,
-          themeColor: const Color(0xFFE07A48),
-        ),
-        CourseModel(
-          id: '3',
-          name: 'Control\nSystem',
-          completedAssignments: 5,
-          totalAssignments: 8,
-          completedTests: 1,
-          totalTests: 2,
-          themeColor: const Color(0xFF4CAF50),
-        ),
-        CourseModel(
-          id: '4',
-          name: 'Electronic\nEngineering',
-          completedAssignments: 6,
-          totalAssignments: 10,
-          completedTests: 1,
-          totalTests: 2,
-          themeColor: const Color(0xFF8D3C2A),
-        ),
-      ];
+  @override
+  State<CoursesScreen> createState() => _CoursesScreenState();
+}
+
+class _CoursesScreenState extends State<CoursesScreen> {
+  final List<CourseModel> _courses = [
+    CourseModel(
+      id: '1',
+      name: 'IoT & Mobile\nApp Dev',
+      classId: 'Class ID: CS-401',
+      completedAssignments: 7,
+      totalAssignments: 10,
+      completedTests: 1,
+      totalTests: 2,
+      themeColor: AppColors.courseBlue,
+    ),
+    CourseModel(
+      id: '2',
+      name: 'English\nComm. A+',
+      classId: 'Class ID: ENG-102',
+      completedAssignments: 8,
+      totalAssignments: 11,
+      completedTests: 2,
+      totalTests: 3,
+      themeColor: AppColors.courseOrange,
+    ),
+    CourseModel(
+      id: '3',
+      name: 'Control System\nEngineering',
+      classId: 'Class ID: EE-304',
+      completedAssignments: 5,
+      totalAssignments: 8,
+      completedTests: 1,
+      totalTests: 2,
+      themeColor: AppColors.courseGreen,
+    ),
+    CourseModel(
+      id: '4',
+      name: 'Electronic\nEngineering',
+      classId: 'Class ID: EE-201',
+      completedAssignments: 6,
+      totalAssignments: 10,
+      completedTests: 1,
+      totalTests: 2,
+      themeColor: AppColors.courseBrown,
+    ),
+    CourseModel(
+      id: '5',
+      name: 'Data Structures\n& Algorithms',
+      classId: 'Class ID: CS-202',
+      completedAssignments: 9,
+      totalAssignments: 12,
+      completedTests: 2,
+      totalTests: 2,
+      themeColor: AppColors.coursePurple,
+    ),
+    CourseModel(
+      id: '6',
+      name: 'Database\nManagement',
+      classId: 'Class ID: CS-305',
+      completedAssignments: 4,
+      totalAssignments: 6,
+      completedTests: 1,
+      totalTests: 1,
+      themeColor: AppColors.courseTeal,
+    ),
+    CourseModel(
+      id: '7',
+      name: 'Artificial\nIntelligence',
+      classId: 'Class ID: AI-410',
+      completedAssignments: 3,
+      totalAssignments: 5,
+      completedTests: 1,
+      totalTests: 2,
+      themeColor: AppColors.courseIndigo,
+    ),
+    CourseModel(
+      id: '8',
+      name: 'Physics II:\nElectricity',
+      classId: 'Class ID: PHY-102',
+      completedAssignments: 7,
+      totalAssignments: 9,
+      completedTests: 2,
+      totalTests: 2,
+      themeColor: AppColors.courseRose,
+    ),
+  ];
+
+  void _showAddCourseDialog() {
+    final nameController = TextEditingController();
+    final classIdController = TextEditingController();
+    final assignController = TextEditingController(text: '5');
+    final testController = TextEditingController(text: '2');
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Add New Course'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: nameController,
+                  decoration: const InputDecoration(labelText: 'Course Name'),
+                ),
+                TextField(
+                  controller: classIdController,
+                  decoration: const InputDecoration(labelText: 'Class ID (e.g. CS-101)'),
+                ),
+                TextField(
+                  controller: assignController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(labelText: 'Total Assignments'),
+                ),
+                TextField(
+                  controller: testController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(labelText: 'Total Tests'),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (nameController.text.isNotEmpty) {
+                  setState(() {
+                    _courses.add(
+                      CourseModel(
+                        id: DateTime.now().millisecondsSinceEpoch.toString(),
+                        name: nameController.text.trim(),
+                        classId: classIdController.text.isEmpty
+                            ? 'Class ID: GEN-100'
+                            : 'Class ID: ${classIdController.text.trim()}',
+                        completedAssignments: 1,
+                        totalAssignments:
+                            int.tryParse(assignController.text) ?? 5,
+                        completedTests: 0,
+                        totalTests: int.tryParse(testController.text) ?? 2,
+                        themeColor: AppColors.primary,
+                      ),
+                    );
+                  });
+                  Navigator.pop(context);
+                }
+              },
+              child: const Text('Add Course'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final courses = _sampleCourses;
+    final isDark = AppColors.isDarkMode(context);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       body: SafeArea(
         child: Column(
           children: [
             const HeaderBar(title: 'COURSES'),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '${_courses.length} Active Courses',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: isDark
+                          ? AppColors.textMutedDark
+                          : const Color(0xFF64748B),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: _showAddCourseDialog,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        children: const [
+                          Icon(Icons.add, color: Colors.white, size: 18),
+                          SizedBox(width: 4),
+                          Text(
+                            'Add Course',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             const SizedBox(height: 8),
             Expanded(
               child: GridView.builder(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-                  childAspectRatio: 0.76,
+                  childAspectRatio: 0.72,
                   crossAxisSpacing: 14,
                   mainAxisSpacing: 14,
                 ),
-                itemCount: courses.length,
+                itemCount: _courses.length,
                 itemBuilder: (context, index) {
-                  return _buildCourseCard(courses[index]);
+                  return _buildCourseCard(_courses[index], isDark);
                 },
               ),
             ),
@@ -78,7 +243,10 @@ class CoursesScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCourseCard(CourseModel course) {
+  Widget _buildCourseCard(CourseModel course, bool isDark) {
+    final cardBg = isDark ? AppColors.cardBgDark : Colors.white;
+    final textPrimary = isDark ? AppColors.textLight : const Color(0xFF0F172A);
+
     return Container(
       decoration: BoxDecoration(
         color: course.themeColor,
@@ -104,7 +272,7 @@ class CoursesScreen extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    fontSize: 18,
+                    fontSize: 17,
                     fontWeight: FontWeight.w900,
                     color: Colors.white,
                     height: 1.1,
@@ -125,17 +293,17 @@ class CoursesScreen extends StatelessWidget {
             ),
           ),
 
-          // White overlay card for stats
+          // White/Dark overlay card for stats
           Positioned(
             left: 0,
             right: 0,
             bottom: 0,
-            top: course.classId != null ? 70 : 64,
+            top: course.classId != null ? 72 : 64,
             child: Container(
               padding: const EdgeInsets.all(14),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
+              decoration: BoxDecoration(
+                color: cardBg,
+                borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(20),
                   topRight: Radius.circular(20),
                   bottomLeft: Radius.circular(24),
@@ -145,12 +313,12 @@ class CoursesScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Progress',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 13,
                       fontWeight: FontWeight.w900,
-                      color: Color(0xFF0F172A),
+                      color: textPrimary,
                     ),
                   ),
                   const SizedBox(height: 6),
@@ -169,48 +337,57 @@ class CoursesScreen extends StatelessWidget {
                   // Current Completed Stats
                   Text(
                     '${course.completedAssignments} Assignment',
-                    style: const TextStyle(
-                      fontSize: 13,
+                    style: TextStyle(
+                      fontSize: 12,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF0F172A),
+                      color: textPrimary,
                     ),
                   ),
                   Text(
                     '${course.completedTests} Test',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF64748B),
+                      color: isDark
+                          ? AppColors.textMutedDark
+                          : const Color(0xFF64748B),
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
 
-                  const Divider(color: Color(0xFFE2E8F0), thickness: 1),
-                  const SizedBox(height: 4),
+                  Divider(
+                    color: isDark
+                        ? const Color(0xFF334155)
+                        : const Color(0xFFE2E8F0),
+                    thickness: 1,
+                  ),
+                  const SizedBox(height: 2),
 
                   // Total Stats
-                  const Text(
+                  Text(
                     'Total',
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 12,
                       fontWeight: FontWeight.w900,
-                      color: Color(0xFF0F172A),
+                      color: textPrimary,
                     ),
                   ),
                   Text(
                     '${course.totalAssignments} Assignment',
-                    style: const TextStyle(
-                      fontSize: 13,
+                    style: TextStyle(
+                      fontSize: 12,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF0F172A),
+                      color: textPrimary,
                     ),
                   ),
                   Text(
                     '${course.totalTests} Test',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF64748B),
+                      color: isDark
+                          ? AppColors.textMutedDark
+                          : const Color(0xFF64748B),
                     ),
                   ),
                 ],

@@ -19,16 +19,16 @@ class GoogleProfilePopupDialog extends StatefulWidget {
 }
 
 class _GoogleProfilePopupDialogState extends State<GoogleProfilePopupDialog> {
-  bool _darkMode = false;
-
   @override
   Widget build(BuildContext context) {
+    final bool isDark = themeNotifier.value == ThemeMode.dark;
+
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? AppColors.cardBgDark : Colors.white,
           borderRadius: BorderRadius.circular(28),
           boxShadow: [
             BoxShadow(
@@ -48,7 +48,10 @@ class _GoogleProfilePopupDialogState extends State<GoogleProfilePopupDialog> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.close, color: Color(0xFF64748B)),
+                    icon: Icon(
+                      Icons.close,
+                      color: isDark ? AppColors.textMutedDark : const Color(0xFF64748B),
+                    ),
                     onPressed: () => Navigator.pop(context),
                   ),
                   const Text(
@@ -73,7 +76,10 @@ class _GoogleProfilePopupDialogState extends State<GoogleProfilePopupDialog> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: AppColors.primary,
-                      border: Border.all(color: Colors.white, width: 3),
+                      border: Border.all(
+                        color: isDark ? AppColors.cardBgDark : Colors.white,
+                        width: 3,
+                      ),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withValues(alpha: 0.1),
@@ -112,21 +118,21 @@ class _GoogleProfilePopupDialogState extends State<GoogleProfilePopupDialog> {
               const SizedBox(height: 12),
 
               // User Full Name & Email
-              const Text(
+              Text(
                 'Sir William',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF0F172A),
+                  color: isDark ? AppColors.textLight : const Color(0xFF0F172A),
                 ),
               ),
               const SizedBox(height: 2),
-              const Text(
+              Text(
                 'SirWilliam@gmail.com',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: Color(0xFF64748B),
+                  color: isDark ? AppColors.textMutedDark : const Color(0xFF64748B),
                 ),
               ),
               const SizedBox(height: 16),
@@ -151,8 +157,11 @@ class _GoogleProfilePopupDialogState extends State<GoogleProfilePopupDialog> {
                   ),
                 ),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: const Color(0xFF0F172A),
-                  side: const BorderSide(color: Color(0xFFCBD5E1), width: 1.5),
+                  foregroundColor: isDark ? AppColors.textLight : const Color(0xFF0F172A),
+                  side: BorderSide(
+                    color: isDark ? AppColors.textMutedDark : const Color(0xFFCBD5E1),
+                    width: 1.5,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
                   ),
@@ -162,11 +171,15 @@ class _GoogleProfilePopupDialogState extends State<GoogleProfilePopupDialog> {
               ),
               const SizedBox(height: 20),
 
-              const Divider(color: Color(0xFFE2E8F0), thickness: 1),
+              Divider(
+                color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                thickness: 1,
+              ),
               const SizedBox(height: 8),
 
               // Profile Popup Menu Options
               _buildPopupOption(
+                isDark: isDark,
                 icon: Icons.person_add_alt_1_outlined,
                 title: 'Add or Switch Account',
                 onTap: () {
@@ -180,6 +193,7 @@ class _GoogleProfilePopupDialogState extends State<GoogleProfilePopupDialog> {
                 },
               ),
               _buildPopupOption(
+                isDark: isDark,
                 icon: Icons.settings_outlined,
                 title: 'Settings',
                 onTap: () {
@@ -193,35 +207,41 @@ class _GoogleProfilePopupDialogState extends State<GoogleProfilePopupDialog> {
                 },
               ),
               _buildPopupOption(
+                isDark: isDark,
                 icon: Icons.dark_mode_outlined,
                 title: 'Dark Theme',
                 trailing: Switch.adaptive(
-                  value: _darkMode,
+                  value: isDark,
                   activeTrackColor: AppColors.primary,
                   onChanged: (val) {
                     setState(() {
-                      _darkMode = val;
+                      themeNotifier.value = val ? ThemeMode.dark : ThemeMode.light;
                     });
                   },
                 ),
                 onTap: () {
                   setState(() {
-                    _darkMode = !_darkMode;
+                    themeNotifier.value = isDark ? ThemeMode.light : ThemeMode.dark;
                   });
                 },
               ),
               _buildPopupOption(
+                isDark: isDark,
                 icon: Icons.help_outline_rounded,
                 title: 'Help & Feedback',
                 onTap: () {},
               ),
 
               const SizedBox(height: 8),
-              const Divider(color: Color(0xFFE2E8F0), thickness: 1),
+              Divider(
+                color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                thickness: 1,
+              ),
               const SizedBox(height: 8),
 
               // Sign Out Option
               _buildPopupOption(
+                isDark: isDark,
                 icon: Icons.logout_rounded,
                 title: 'Sign Out',
                 textColor: Colors.redAccent,
@@ -245,13 +265,19 @@ class _GoogleProfilePopupDialogState extends State<GoogleProfilePopupDialog> {
   }
 
   Widget _buildPopupOption({
+    required bool isDark,
     required IconData icon,
     required String title,
     required VoidCallback onTap,
     Widget? trailing,
-    Color textColor = const Color(0xFF0F172A),
-    Color iconColor = const Color(0xFF475569),
+    Color? textColor,
+    Color? iconColor,
   }) {
+    final effectiveTextColor = textColor ??
+        (isDark ? AppColors.textLight : const Color(0xFF0F172A));
+    final effectiveIconColor = iconColor ??
+        (isDark ? AppColors.textMutedDark : const Color(0xFF475569));
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
@@ -259,7 +285,7 @@ class _GoogleProfilePopupDialogState extends State<GoogleProfilePopupDialog> {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         child: Row(
           children: [
-            Icon(icon, color: iconColor, size: 22),
+            Icon(icon, color: effectiveIconColor, size: 22),
             const SizedBox(width: 14),
             Expanded(
               child: Text(
@@ -267,7 +293,7 @@ class _GoogleProfilePopupDialogState extends State<GoogleProfilePopupDialog> {
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
-                  color: textColor,
+                  color: effectiveTextColor,
                 ),
               ),
             ),
