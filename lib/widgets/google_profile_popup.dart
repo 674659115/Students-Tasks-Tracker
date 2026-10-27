@@ -199,7 +199,7 @@ class _GoogleProfilePopupDialogState extends State<GoogleProfilePopupDialog> {
                   _buildPopupOption(
                     isDark: isDark,
                     icon: Icons.person_add_alt_1_outlined,
-                    title: 'Add or Switch Account',
+                    title: AppStrings.get('add_or_switch_account'),
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.push(
@@ -316,7 +316,7 @@ class _GoogleProfilePopupDialogState extends State<GoogleProfilePopupDialog> {
                 title,
                 style: TextStyle(
                   fontSize: 15,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.bold,
                   color: effectiveTextColor,
                 ),
               ),
