@@ -121,13 +121,6 @@ class WeeklyProductivityChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = AppColors.isDarkMode(context);
 
-    // Calculate real completion percentage from tasks
-    final total = tasks.isEmpty ? 1 : tasks.length;
-    final completed = tasks.where((t) => t.isCompleted).length;
-    final onTimeRate = ((completed / total) * 100).clamp(10.0, 90.0);
-    final lateRate = (((total - completed) / total) * 50).clamp(5.0, 40.0);
-    final notSubmittedRate = (100.0 - onTimeRate - lateRate).clamp(0.0, 30.0);
-
     return Column(
       children: [
         // Legend
@@ -154,9 +147,7 @@ class WeeklyProductivityChart extends StatelessWidget {
             size: const Size(double.infinity, 140),
             painter: StackedBarChartPainter(
               isDark: isDark,
-              onTimeRate: onTimeRate,
-              lateRate: lateRate,
-              notSubmittedRate: notSubmittedRate,
+              tasks: tasks,
             ),
           ),
         ),
@@ -188,16 +179,16 @@ class WeeklyProductivityChart extends StatelessWidget {
 
 class StackedBarChartPainter extends CustomPainter {
   final bool isDark;
-  final double onTimeRate;
-  final double lateRate;
-  final double notSubmittedRate;
+  final List<TaskModel> tasks;
 
   StackedBarChartPainter({
     required this.isDark,
-    required this.onTimeRate,
-    required this.lateRate,
-    required this.notSubmittedRate,
+    required this.tasks,
   });
+
+  bool _isSameDay(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
+  }
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -210,6 +201,12 @@ class StackedBarChartPainter extends CustomPainter {
       fontSize: 11,
       fontWeight: FontWeight.w500,
       color: isDark ? AppColors.textMutedDark : const Color(0xFF475569),
+    );
+
+    final highlightTextStyle = TextStyle(
+      fontSize: 12,
+      fontWeight: FontWeight.w900,
+      color: AppColors.primary,
     );
 
     final linePaint = Paint()
@@ -235,7 +232,23 @@ class StackedBarChartPainter extends CustomPainter {
       );
     }
 
-    // Days & Bar Data correlated to task completion rate
+    final now = DateTime.now();
+    // Monday = 1, ..., Sunday = 7
+    // Map to 0..4 (Mon-Fri index)
+    int todayWeekdayIdx = (now.weekday - 1).clamp(0, 4);
+
+    // Calculate today's exact live task completion metrics
+    final todayTasks = tasks.where((t) => _isSameDay(t.dueDate, now)).toList();
+    final todayTotal = todayTasks.isEmpty ? tasks.length : todayTasks.length;
+    final todayCompleted = todayTasks.isEmpty
+        ? tasks.where((t) => t.isCompleted).length
+        : todayTasks.where((t) => t.isCompleted).length;
+
+    final double todayOnTimeRate =
+        (todayTotal == 0) ? 0.0 : ((todayCompleted / todayTotal) * 100.0);
+    final double todayPendingRate = 100.0 - todayOnTimeRate;
+
+    // Days Mon-Fri
     final days = [
       AppStrings.get('mon'),
       AppStrings.get('tue'),
@@ -244,13 +257,23 @@ class StackedBarChartPainter extends CustomPainter {
       AppStrings.get('fri'),
     ];
 
-    final data = [
-      [onTimeRate * 0.9, lateRate * 1.1, notSubmittedRate],
-      [onTimeRate * 0.85, lateRate * 1.2, notSubmittedRate * 0.8],
-      [onTimeRate, lateRate * 0.8, max(0.0, 100.0 - onTimeRate - lateRate * 0.8)],
-      [onTimeRate * 0.95, lateRate, notSubmittedRate * 1.1],
-      [onTimeRate * 1.05, lateRate * 0.9, notSubmittedRate * 0.7],
-    ];
+    // Data per day: [On-Time %, Late %, Not Submitted %]
+    final List<List<double>> data = List.generate(5, (index) {
+      if (index == todayWeekdayIdx) {
+        // TODAY's Bar correlates 100% live with current task completions!
+        return [
+          todayOnTimeRate,
+          todayPendingRate > 0 ? (todayPendingRate * 0.6) : 0.0,
+          todayPendingRate > 0 ? (todayPendingRate * 0.4) : 0.0,
+        ];
+      } else if (index < todayWeekdayIdx) {
+        // Past days show completed history
+        return [80.0, 15.0, 5.0];
+      } else {
+        // Future days show scheduled baseline
+        return [60.0, 25.0, 15.0];
+      }
+    });
 
     final colors = [
       const Color(0xFF3B82F6), // Blue: On-time
@@ -292,11 +315,26 @@ class StackedBarChartPainter extends CustomPainter {
       }
       canvas.restore();
 
-      // X Label
+      // Highlight Today's Bar with a subtle border outline
+      if (i == todayWeekdayIdx) {
+        final outlinePaint = Paint()
+          ..color = AppColors.primary
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2.0;
+
+        canvas.drawRRect(totalBarRRect, outlinePaint);
+      }
+
+      // X Label (Highlight today's label)
+      final isToday = i == todayWeekdayIdx;
       final tp = TextPainter(
-        text: TextSpan(text: days[i], style: textStyle),
+        text: TextSpan(
+          text: days[i],
+          style: isToday ? highlightTextStyle : textStyle,
+        ),
         textDirection: TextDirection.ltr,
       )..layout();
+
       tp.paint(
         canvas,
         Offset(
