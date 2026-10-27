@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import '../localization/app_localizations.dart';
 import '../theme/app_theme.dart';
 
 // --- Donut Chart Widget ---
@@ -120,16 +121,16 @@ class WeeklyProductivityChart extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _buildLegendItem(const Color(0xFF3B82F6), 'On-Time Submission', isDark),
+            _buildLegendItem(const Color(0xFF3B82F6), AppStrings.get('on_time_submission'), isDark),
             const SizedBox(width: 12),
-            _buildLegendItem(const Color(0xFFFFD54F), 'Late Submission', isDark),
+            _buildLegendItem(const Color(0xFFFFD54F), AppStrings.get('late_submission'), isDark),
           ],
         ),
         const SizedBox(height: 6),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _buildLegendItem(const Color(0xFFC63D2F), 'Not Submitted', isDark),
+            _buildLegendItem(const Color(0xFFC63D2F), AppStrings.get('not_submitted'), isDark),
           ],
         ),
         const SizedBox(height: 16),
@@ -209,7 +210,13 @@ class StackedBarChartPainter extends CustomPainter {
     }
 
     // Days & Bar Data
-    final days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+    final days = [
+      AppStrings.get('mon'),
+      AppStrings.get('tue'),
+      AppStrings.get('wed'),
+      AppStrings.get('thu'),
+      AppStrings.get('fri'),
+    ];
     final data = [
       [65.0, 20.0, 15.0],
       [60.0, 25.0, 15.0],

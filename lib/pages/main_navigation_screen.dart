@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../localization/app_localizations.dart';
 import '../models/task_model.dart';
 import '../theme/app_theme.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
@@ -82,34 +83,39 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = AppColors.isDarkMode(context);
+    return ValueListenableBuilder<String>(
+      valueListenable: languageNotifier,
+      builder: (context, currentLang, child) {
+        final isDark = AppColors.isDarkMode(context);
 
-    final List<Widget> pages = [
-      HomeScreen(
-        tasks: _tasks,
-        onTaskAdded: _addNewTask,
-        onTaskToggled: _toggleTask,
-        onTaskDeleted: _deleteTask,
-      ),
-      const CoursesScreen(),
-      const CalendarScreen(),
-      const AnalyticalScreen(),
-    ];
+        final List<Widget> pages = [
+          HomeScreen(
+            tasks: _tasks,
+            onTaskAdded: _addNewTask,
+            onTaskToggled: _toggleTask,
+            onTaskDeleted: _deleteTask,
+          ),
+          const CoursesScreen(),
+          const CalendarScreen(),
+          const AnalyticalScreen(),
+        ];
 
-    return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
-      body: IndexedStack(
-        index: _currentIndex,
-        children: pages,
-      ),
-      bottomNavigationBar: CustomBottomNavBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-      ),
+        return Scaffold(
+          backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+          body: IndexedStack(
+            index: _currentIndex,
+            children: pages,
+          ),
+          bottomNavigationBar: CustomBottomNavBar(
+            currentIndex: _currentIndex,
+            onTap: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
+            },
+          ),
+        );
+      },
     );
   }
 }
