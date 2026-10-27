@@ -14,50 +14,55 @@ class CustomBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = AppColors.isDarkMode(context);
-    final cardBg = isDark ? AppColors.cardBgDark : Colors.white;
+    return ValueListenableBuilder<String>(
+      valueListenable: languageNotifier,
+      builder: (context, currentLang, child) {
+        final isDark = AppColors.isDarkMode(context);
+        final cardBg = isDark ? AppColors.cardBgDark : Colors.white;
 
-    return Container(
-      height: 72,
-      decoration: BoxDecoration(
-        color: cardBg,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
+        return Container(
+          height: 72,
+          decoration: BoxDecoration(
+            color: cardBg,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.06),
+                blurRadius: 10,
+                offset: const Offset(0, -2),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildNavItem(
-            context: context,
-            index: 0,
-            icon: Icons.home,
-            label: AppStrings.get('home'),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildNavItem(
+                context: context,
+                index: 0,
+                icon: Icons.home,
+                label: AppStrings.get('home'),
+              ),
+              _buildNavItem(
+                context: context,
+                index: 1,
+                icon: Icons.folder_copy_outlined,
+                label: AppStrings.get('courses'),
+              ),
+              _buildNavItem(
+                context: context,
+                index: 2,
+                icon: Icons.calendar_today_outlined,
+                label: AppStrings.get('calendar'),
+              ),
+              _buildNavItem(
+                context: context,
+                index: 3,
+                icon: Icons.person,
+                label: AppStrings.get('profile'),
+              ),
+            ],
           ),
-          _buildNavItem(
-            context: context,
-            index: 1,
-            icon: Icons.folder_copy_outlined,
-            label: AppStrings.get('courses'),
-          ),
-          _buildNavItem(
-            context: context,
-            index: 2,
-            icon: Icons.calendar_today_outlined,
-            label: AppStrings.get('calendar'),
-          ),
-          _buildNavItem(
-            context: context,
-            index: 3,
-            icon: Icons.person,
-            label: AppStrings.get('profile'),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 

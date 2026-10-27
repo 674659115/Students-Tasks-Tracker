@@ -424,166 +424,171 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = AppColors.isDarkMode(context);
-    final cardBg = isDark ? AppColors.cardBgDark : Colors.white;
-    final textPrimary = isDark ? AppColors.textLight : const Color(0xFF0F172A);
+    return ValueListenableBuilder<String>(
+      valueListenable: languageNotifier,
+      builder: (context, currentLang, child) {
+        final isDark = AppColors.isDarkMode(context);
+        final cardBg = isDark ? AppColors.cardBgDark : Colors.white;
+        final textPrimary = isDark ? AppColors.textLight : const Color(0xFF0F172A);
 
-    final currentMonthDeadlines = _deadlines
-        .where((d) =>
-            d.monthNumber == _focusedMonth.month && d.year == _focusedMonth.year)
-        .toList();
+        final currentMonthDeadlines = _deadlines
+            .where((d) =>
+                d.monthNumber == _focusedMonth.month && d.year == _focusedMonth.year)
+            .toList();
 
-    return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
-      body: SafeArea(
-        child: Stack(
-          children: [
-            SingleChildScrollView(
-              padding: const EdgeInsets.only(bottom: 90),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header
-                  HeaderBar(title: AppStrings.get('calendar')),
+        return Scaffold(
+          backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+          body: SafeArea(
+            child: Stack(
+              children: [
+                SingleChildScrollView(
+                  padding: const EdgeInsets.only(bottom: 90),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Header
+                      HeaderBar(title: AppStrings.get('calendar')),
 
-                  // Month Navigation Row (< SEPTEMBER 2026 >)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
+                      // Month Navigation Row (< SEPTEMBER 2026 >)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            IconButton(
-                              icon: const Icon(Icons.chevron_left_rounded, size: 28),
-                              onPressed: () => _changeMonth(-1),
-                            ),
-                            Text(
-                              '${_monthNames[_focusedMonth.month - 1]} ${_focusedMonth.year}',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w900,
-                                color: isDark
-                                    ? AppColors.textMutedDark
-                                    : const Color(0xFF94A3B8),
-                                letterSpacing: 0.8,
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.chevron_right_rounded, size: 28),
-                              onPressed: () => _changeMonth(1),
-                            ),
-                          ],
-                        ),
-                        GestureDetector(
-                          onTap: _showAddEventDialog,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.primary,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Row(
+                            Row(
                               children: [
-                                const Icon(Icons.add, color: Colors.white, size: 16),
-                                const SizedBox(width: 4),
+                                IconButton(
+                                  icon: const Icon(Icons.chevron_left_rounded, size: 28),
+                                  onPressed: () => _changeMonth(-1),
+                                ),
                                 Text(
-                                  AppStrings.get('add_event'),
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 12,
+                                  '${_monthNames[_focusedMonth.month - 1]} ${_focusedMonth.year}',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w900,
+                                    color: isDark
+                                        ? AppColors.textMutedDark
+                                        : const Color(0xFF94A3B8),
+                                    letterSpacing: 0.8,
                                   ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.chevron_right_rounded, size: 28),
+                                  onPressed: () => _changeMonth(1),
                                 ),
                               ],
                             ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Calendar Grid Container
-                  Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 20),
-                    decoration: BoxDecoration(
-                      color: cardBg,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.04),
-                          blurRadius: 8,
-                        ),
-                      ],
-                    ),
-                    child: Table(
-                      border: TableBorder.all(
-                        color: isDark
-                            ? const Color(0xFF334155)
-                            : const Color(0xFFCBD5E1),
-                        width: 1,
-                      ),
-                      children: _buildCalendarTableRows(cardBg, textPrimary, isDark),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // UPCOMING DEADLINE Header
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Text(
-                      AppStrings.get('upcoming_deadline'),
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 0.5,
-                        color: textPrimary,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Upcoming Deadline Cards List
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: currentMonthDeadlines.isEmpty
-                        ? Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 20),
-                            child: Center(
-                              child: Text(
-                                'No deadlines scheduled for ${_monthNames[_focusedMonth.month - 1]}!',
-                                style: TextStyle(
-                                  color: isDark
-                                      ? AppColors.textMutedDark
-                                      : AppColors.textMuted,
+                            GestureDetector(
+                              onTap: _showAddEventDialog,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.add, color: Colors.white, size: 16),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      AppStrings.get('add_event'),
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
-                          )
-                        : Column(
-                            children: currentMonthDeadlines.map((item) {
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 12),
-                                child: _buildDeadlineCard(
-                                  item: item,
-                                  cardBg: cardBg,
-                                  textPrimary: textPrimary,
-                                  isDark: isDark,
-                                ),
-                              );
-                            }).toList(),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+
+                      // Calendar Grid Container
+                      Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 20),
+                        decoration: BoxDecoration(
+                          color: cardBg,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.04),
+                              blurRadius: 8,
+                            ),
+                          ],
+                        ),
+                        child: Table(
+                          border: TableBorder.all(
+                            color: isDark
+                                ? const Color(0xFF334155)
+                                : const Color(0xFFCBD5E1),
+                            width: 1,
                           ),
+                          children: _buildCalendarTableRows(cardBg, textPrimary, isDark),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+
+                      // UPCOMING DEADLINE Header
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Text(
+                          AppStrings.get('upcoming_deadline'),
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 0.5,
+                            color: textPrimary,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+
+                      // Upcoming Deadline Cards List
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: currentMonthDeadlines.isEmpty
+                            ? Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 20),
+                                child: Center(
+                                  child: Text(
+                                    'No deadlines scheduled for ${_monthNames[_focusedMonth.month - 1]}!',
+                                    style: TextStyle(
+                                      color: isDark
+                                          ? AppColors.textMutedDark
+                                          : AppColors.textMuted,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : Column(
+                                children: currentMonthDeadlines.map((item) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 12),
+                                    child: _buildDeadlineCard(
+                                      item: item,
+                                      cardBg: cardBg,
+                                      textPrimary: textPrimary,
+                                      isDark: isDark,
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 

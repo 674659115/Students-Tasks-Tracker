@@ -169,78 +169,83 @@ class _CoursesScreenState extends State<CoursesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = AppColors.isDarkMode(context);
+    return ValueListenableBuilder<String>(
+      valueListenable: languageNotifier,
+      builder: (context, currentLang, child) {
+        final isDark = AppColors.isDarkMode(context);
 
-    return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
-      body: SafeArea(
-        child: Column(
-          children: [
-            HeaderBar(title: AppStrings.get('courses')),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    '${_courses.length} ${AppStrings.get('active_courses')}',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: isDark
-                          ? AppColors.textMutedDark
-                          : const Color(0xFF64748B),
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: _showAddCourseDialog,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 8,
+        return Scaffold(
+          backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+          body: SafeArea(
+            child: Column(
+              children: [
+                HeaderBar(title: AppStrings.get('courses')),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '${_courses.length} ${AppStrings.get('active_courses')}',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: isDark
+                              ? AppColors.textMutedDark
+                              : const Color(0xFF64748B),
+                        ),
                       ),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.add, color: Colors.white, size: 18),
-                          const SizedBox(width: 4),
-                          Text(
-                            AppStrings.get('add_course'),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 13,
-                            ),
+                      GestureDetector(
+                        onTap: _showAddCourseDialog,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 8,
                           ),
-                        ],
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.add, color: Colors.white, size: 18),
+                              const SizedBox(width: 4),
+                              Text(
+                                AppStrings.get('add_course'),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 8),
-            Expanded(
-              child: GridView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 0.72,
-                  crossAxisSpacing: 14,
-                  mainAxisSpacing: 14,
                 ),
-                itemCount: _courses.length,
-                itemBuilder: (context, index) {
-                  return _buildCourseCard(_courses[index], isDark);
-                },
-              ),
+                const SizedBox(height: 8),
+                Expanded(
+                  child: GridView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 0.72,
+                      crossAxisSpacing: 14,
+                      mainAxisSpacing: 14,
+                    ),
+                    itemCount: _courses.length,
+                    itemBuilder: (context, index) {
+                      return _buildCourseCard(_courses[index], isDark);
+                    },
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
