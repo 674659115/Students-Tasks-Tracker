@@ -5,6 +5,7 @@ class CustomTextField extends StatefulWidget {
   final String label;
   final String hintText;
   final TextEditingController? controller;
+  final FocusNode? focusNode;
   final bool isPassword;
   final Widget? suffixIcon;
   final TextInputType keyboardType;
@@ -14,6 +15,7 @@ class CustomTextField extends StatefulWidget {
     required this.label,
     required this.hintText,
     this.controller,
+    this.focusNode,
     this.isPassword = false,
     this.suffixIcon,
     this.keyboardType = TextInputType.text,
@@ -25,6 +27,21 @@ class CustomTextField extends StatefulWidget {
 
 class _CustomTextFieldState extends State<CustomTextField> {
   bool _obscureText = true;
+  late FocusNode _effectiveFocusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    _effectiveFocusNode = widget.focusNode ?? FocusNode();
+  }
+
+  @override
+  void dispose() {
+    if (widget.focusNode == null) {
+      _effectiveFocusNode.dispose();
+    }
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,49 +61,59 @@ class _CustomTextFieldState extends State<CustomTextField> {
           ),
         ),
         const SizedBox(height: 8),
-        Container(
-          decoration: BoxDecoration(
-            color: cardBg,
-            borderRadius: BorderRadius.circular(30),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
+        GestureDetector(
+          onTap: () {
+            _effectiveFocusNode.requestFocus();
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              color: cardBg,
+              borderRadius: BorderRadius.circular(30),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: TextField(
+              controller: widget.controller,
+              focusNode: _effectiveFocusNode,
+              obscureText: widget.isPassword ? _obscureText : false,
+              autocorrect: !widget.isPassword,
+              enableSuggestions: !widget.isPassword,
+              keyboardType: widget.isPassword
+                  ? TextInputType.visiblePassword
+                  : widget.keyboardType,
+              style: TextStyle(fontSize: 15, color: textPrimary),
+              decoration: InputDecoration(
+                hintText: widget.hintText,
+                hintStyle: const TextStyle(color: Color(0xFFA0AEC0)),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 16,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide.none,
+                ),
+                suffixIcon: widget.isPassword
+                    ? IconButton(
+                        icon: Icon(
+                          _obscureText
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
+                          color: const Color(0xFFA0AEC0),
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscureText = !_obscureText;
+                          });
+                        },
+                      )
+                    : widget.suffixIcon,
               ),
-            ],
-          ),
-          child: TextField(
-            controller: widget.controller,
-            obscureText: widget.isPassword ? _obscureText : false,
-            keyboardType: widget.keyboardType,
-            style: TextStyle(fontSize: 15, color: textPrimary),
-            decoration: InputDecoration(
-              hintText: widget.hintText,
-              hintStyle: const TextStyle(color: Color(0xFFA0AEC0)),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 24,
-                vertical: 16,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(30),
-                borderSide: BorderSide.none,
-              ),
-              suffixIcon: widget.isPassword
-                  ? IconButton(
-                      icon: Icon(
-                        _obscureText
-                            ? Icons.visibility_off_outlined
-                            : Icons.visibility_outlined,
-                        color: const Color(0xFFA0AEC0),
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _obscureText = !_obscureText;
-                        });
-                      },
-                    )
-                  : widget.suffixIcon,
             ),
           ),
         ),
