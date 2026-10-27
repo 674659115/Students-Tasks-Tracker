@@ -1,15 +1,28 @@
 import 'package:flutter/material.dart';
 import '../localization/app_localizations.dart';
+import '../models/task_model.dart';
 import '../theme/app_theme.dart';
 import '../widgets/header_bar.dart';
 import '../widgets/charts.dart';
 import 'settings_screen.dart';
 
 class AnalyticalScreen extends StatelessWidget {
-  const AnalyticalScreen({super.key});
+  final List<TaskModel> tasks;
+
+  const AnalyticalScreen({
+    super.key,
+    this.tasks = const [],
+  });
 
   @override
   Widget build(BuildContext context) {
+    // Dynamic Task Completion Rate Calculation
+    final totalTasks = tasks.length;
+    final completedTasks = tasks.where((t) => t.isCompleted).length;
+    final completionRate = totalTasks == 0
+        ? 0
+        : ((completedTasks / totalTasks) * 100).round();
+
     return ValueListenableBuilder<String>(
       valueListenable: languageNotifier,
       builder: (context, currentLang, child) {
@@ -117,7 +130,7 @@ class AnalyticalScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
 
-                  // Card 1: Task Completion Rate
+                  // Card 1: Dynamic Task Completion Rate
                   Container(
                     width: double.infinity,
                     margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -146,13 +159,28 @@ class AnalyticalScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 12),
-                        Text(
-                          '70%',
-                          style: TextStyle(
-                            fontSize: 48,
-                            fontWeight: FontWeight.w900,
-                            color: textPrimary,
-                          ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.baseline,
+                          textBaseline: TextBaseline.alphabetic,
+                          children: [
+                            Text(
+                              '$completionRate%',
+                              style: TextStyle(
+                                fontSize: 48,
+                                fontWeight: FontWeight.w900,
+                                color: textPrimary,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              '($completedTasks / $totalTasks ${AppStrings.get('complete').toLowerCase()})',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -188,7 +216,7 @@ class AnalyticalScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 16),
-                        const WeeklyProductivityChart(),
+                        WeeklyProductivityChart(tasks: tasks),
                       ],
                     ),
                   ),
@@ -223,7 +251,7 @@ class AnalyticalScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 20),
-                        const TaskByCoursePieChart(),
+                        TaskByCoursePieChart(tasks: tasks),
                       ],
                     ),
                   ),
