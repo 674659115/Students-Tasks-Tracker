@@ -64,99 +64,120 @@ class AuthQuickHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = AppColors.isDarkMode(context);
+    return ValueListenableBuilder<String>(
+      valueListenable: languageNotifier,
+      builder: (context, currentLang, child) {
+        final isDark = AppColors.isDarkMode(context);
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        if (showBackButton && Navigator.canPop(context))
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: isDark ? AppColors.cardBgDark : Colors.white,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.06),
-                    blurRadius: 8,
-                  ),
-                ],
-              ),
-              child: Icon(
-                Icons.arrow_back,
-                color: isDark ? AppColors.textLight : AppColors.textDark,
-              ),
-            ),
-          )
-        else
-          const SizedBox(width: 44),
+        // Friendly short name for button text
+        String displayLang = currentLang.split(' ').first;
+        if (currentLang.contains('Thai') || currentLang.contains('ไทย')) {
+          displayLang = 'ภาษาไทย';
+        } else if (currentLang.contains('Spanish') || currentLang.contains('Español')) {
+          displayLang = 'Español';
+        } else if (currentLang.contains('French') || currentLang.contains('Français')) {
+          displayLang = 'Français';
+        } else if (currentLang.contains('German') || currentLang.contains('Deutsch')) {
+          displayLang = 'Deutsch';
+        } else if (currentLang.contains('Chinese') || currentLang.contains('中文')) {
+          displayLang = '中文';
+        } else {
+          displayLang = 'English';
+        }
 
-        Row(
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Quick Language Button
-            GestureDetector(
-              onTap: () => _showLanguageDialog(context, isDark),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: isDark ? AppColors.cardBgDark : Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.04),
-                      blurRadius: 6,
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.language_rounded, size: 20, color: AppColors.primary),
-                    const SizedBox(width: 4),
-                    Text(
-                      languageNotifier.value.split(' ').first,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? AppColors.textLight : AppColors.textDark,
+            if (showBackButton && Navigator.canPop(context))
+              GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: isDark ? AppColors.cardBgDark : Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.06),
+                        blurRadius: 8,
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
+                  child: Icon(
+                    Icons.arrow_back,
+                    color: isDark ? AppColors.textLight : AppColors.textDark,
+                  ),
                 ),
-              ),
-            ),
-            const SizedBox(width: 8),
+              )
+            else
+              const SizedBox(width: 44),
 
-            // Quick Dark Mode Toggle Button
-            GestureDetector(
-              onTap: () {
-                themeNotifier.value = isDark ? ThemeMode.light : ThemeMode.dark;
-              },
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: isDark ? AppColors.cardBgDark : Colors.white,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.04),
-                      blurRadius: 6,
+            Row(
+              children: [
+                // Quick Language Button
+                GestureDetector(
+                  onTap: () => _showLanguageDialog(context, isDark),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                    decoration: BoxDecoration(
+                      color: isDark ? AppColors.cardBgDark : Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.04),
+                          blurRadius: 6,
+                        ),
+                      ],
                     ),
-                  ],
+                    child: Row(
+                      children: [
+                        const Icon(Icons.language_rounded, size: 20, color: AppColors.primary),
+                        const SizedBox(width: 6),
+                        Text(
+                          displayLang,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? AppColors.textLight : AppColors.textDark,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                child: Icon(
-                  isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
-                  size: 20,
-                  color: isDark ? Colors.amber : const Color(0xFF0F172A),
+                const SizedBox(width: 8),
+
+                // Quick Dark Mode Toggle Button
+                GestureDetector(
+                  onTap: () {
+                    themeNotifier.value = isDark ? ThemeMode.light : ThemeMode.dark;
+                  },
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: isDark ? AppColors.cardBgDark : Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.04),
+                          blurRadius: 6,
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+                      size: 20,
+                      color: isDark ? Colors.amber : const Color(0xFF0F172A),
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
           ],
-        ),
-      ],
+        );
+      },
     );
   }
 }
