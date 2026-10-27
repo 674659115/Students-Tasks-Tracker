@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../localization/app_localizations.dart';
 import '../theme/app_theme.dart';
 import '../widgets/header_bar.dart';
 import '../widgets/charts.dart';
@@ -22,7 +23,7 @@ class AnalyticalScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Header
-              const HeaderBar(title: 'PROFILE'),
+              HeaderBar(title: AppStrings.get('profile')),
               const SizedBox(height: 12),
 
               // Settings Option Banner in Profile Tab
@@ -77,7 +78,7 @@ class AnalyticalScreen extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'App & Account Settings',
+                                  AppStrings.get('app_account_settings'),
                                   style: TextStyle(
                                     fontSize: 17,
                                     fontWeight: FontWeight.bold,
@@ -86,7 +87,7 @@ class AnalyticalScreen extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'Manage password, notifications & preferences',
+                                  AppStrings.get('manage_settings_sub'),
                                   style: TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w500,
@@ -133,7 +134,7 @@ class AnalyticalScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'TASK COMPLETION RATE',
+                      AppStrings.get('task_completion_rate'),
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w900,
@@ -175,7 +176,7 @@ class AnalyticalScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'WEEKLY PRODUCTIVITY',
+                      AppStrings.get('weekly_productivity'),
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w900,
@@ -210,7 +211,7 @@ class AnalyticalScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'TASK BY COURSE',
+                      AppStrings.get('task_by_course'),
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w900,

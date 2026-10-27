@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../localization/app_localizations.dart';
 import '../models/task_model.dart';
 import '../theme/app_theme.dart';
 import '../widgets/header_bar.dart';
@@ -104,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   // Top Header
                   HeaderBar(
                     subtitle: formatHeaderDate(),
-                    title: 'Welcome, User!',
+                    title: AppStrings.get('welcome_user'),
                   ),
                   const SizedBox(height: 12),
 
@@ -117,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         _buildStatCard(
                           context: context,
-                          title: 'TODAY TASKS',
+                          title: AppStrings.get('today_tasks'),
                           completed: todayCompleted,
                           total: todayTotal,
                           progress: todayProgress,
@@ -129,7 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SizedBox(width: 14),
                         _buildStatCard(
                           context: context,
-                          title: 'WEEKLY TASKS',
+                          title: AppStrings.get('weekly_tasks'),
                           completed: weeklyCompleted,
                           total: weeklyTotal,
                           progress: weeklyProgress,
@@ -147,7 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Text(
-                      'MY TASKS',
+                      AppStrings.get('my_tasks'),
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w900,
@@ -286,9 +287,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     children: [
                       TextSpan(
-                        text: 'OUT\nOF ',
+                        text: '${AppStrings.get('out_of')} ',
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 12,
                           fontWeight: FontWeight.w900,
                           color: textPrimary,
                         ),
@@ -305,9 +306,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 Text(
-                  'Complete',
+                  AppStrings.get('complete'),
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 13,
                     fontWeight: FontWeight.bold,
                     color: activeColor,
                   ),

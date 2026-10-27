@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'localization/app_localizations.dart';
 import 'theme/app_theme.dart';
 import 'pages/splash_screen.dart';
 
@@ -14,13 +15,18 @@ class StudentTaskTrackerApp extends StatelessWidget {
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: themeNotifier,
       builder: (context, currentMode, child) {
-        return MaterialApp(
-          title: 'Students Task Tracker',
-          debugShowCheckedModeBanner: false,
-          theme: AppTheme.lightTheme,
-          darkTheme: AppTheme.darkTheme,
-          themeMode: currentMode,
-          home: const SplashScreen(),
+        return ValueListenableBuilder<String>(
+          valueListenable: languageNotifier,
+          builder: (context, currentLang, child) {
+            return MaterialApp(
+              title: 'Students Task Tracker',
+              debugShowCheckedModeBanner: false,
+              theme: AppTheme.lightTheme,
+              darkTheme: AppTheme.darkTheme,
+              themeMode: currentMode,
+              home: const SplashScreen(),
+            );
+          },
         );
       },
     );

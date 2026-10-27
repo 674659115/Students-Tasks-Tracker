@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import '../localization/app_localizations.dart';
 import '../theme/app_theme.dart';
 import '../widgets/header_bar.dart';
 
 class CalendarDeadline {
   final String id;
   final String month;
+  final int monthNumber;
+  final int year;
   final int day;
   final String title;
   final String course;
@@ -15,6 +18,8 @@ class CalendarDeadline {
   CalendarDeadline({
     required this.id,
     required this.month,
+    required this.monthNumber,
+    required this.year,
     required this.day,
     required this.title,
     required this.course,
@@ -32,10 +37,14 @@ class CalendarScreen extends StatefulWidget {
 }
 
 class _CalendarScreenState extends State<CalendarScreen> {
+  DateTime _focusedMonth = DateTime(2026, 9, 1);
+
   final List<CalendarDeadline> _deadlines = [
     CalendarDeadline(
       id: '1',
       month: 'Sep',
+      monthNumber: 9,
+      year: 2026,
       day: 7,
       title: 'Coding Project',
       course: 'IoT & Mobile App',
@@ -46,6 +55,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
     CalendarDeadline(
       id: '2',
       month: 'Sep',
+      monthNumber: 9,
+      year: 2026,
       day: 8,
       title: 'MidTerm Exam',
       course: 'Eng A+',
@@ -56,6 +67,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
     CalendarDeadline(
       id: '3',
       month: 'Sep',
+      monthNumber: 9,
+      year: 2026,
       day: 9,
       title: 'Presentation',
       course: 'Control System',
@@ -66,6 +79,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
     CalendarDeadline(
       id: '4',
       month: 'Sep',
+      monthNumber: 9,
+      year: 2026,
       day: 11,
       title: 'Lab Report',
       course: 'Electronic Engineering',
@@ -75,18 +90,65 @@ class _CalendarScreenState extends State<CalendarScreen> {
     ),
     CalendarDeadline(
       id: '5',
-      month: 'Sep',
-      day: 16,
-      title: 'Quiz 2',
-      course: 'Data Structures',
+      month: 'Oct',
+      monthNumber: 10,
+      year: 2026,
+      day: 15,
+      title: 'Database Quiz',
+      course: 'Database Management',
+      time: '14:00',
+      priority: 'HIGH',
+      dotColor: AppColors.priorityHigh,
+    ),
+    CalendarDeadline(
+      id: '6',
+      month: 'Oct',
+      monthNumber: 10,
+      year: 2026,
+      day: 22,
+      title: 'AI Presentation',
+      course: 'Artificial Intelligence',
       time: '11:00',
       priority: 'MEDIUM',
       dotColor: AppColors.priorityMedium,
     ),
   ];
 
+  static const List<String> _monthNames = [
+    'JANUARY',
+    'FEBRUARY',
+    'MARCH',
+    'APRIL',
+    'MAY',
+    'JUNE',
+    'JULY',
+    'AUGUST',
+    'SEPTEMBER',
+    'OCTOBER',
+    'NOVEMBER',
+    'DECEMBER'
+  ];
+
+  static const List<String> _monthShortNames = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec'
+  ];
+
   Color? _getDotForDay(int dayNumber) {
-    final matches = _deadlines.where((d) => d.day == dayNumber).toList();
+    final matches = _deadlines.where((d) =>
+        d.day == dayNumber &&
+        d.monthNumber == _focusedMonth.month &&
+        d.year == _focusedMonth.year).toList();
     if (matches.isEmpty) return null;
     return matches.first.dotColor;
   }
@@ -97,13 +159,26 @@ class _CalendarScreenState extends State<CalendarScreen> {
     });
   }
 
+  void _changeMonth(int offset) {
+    setState(() {
+      _focusedMonth = DateTime(
+        _focusedMonth.year,
+        _focusedMonth.month + offset,
+        1,
+      );
+    });
+  }
+
   void _showAddEventDialog() {
     final titleController = TextEditingController();
     final courseController = TextEditingController(text: 'IoT & Mobile App');
     final timeController = TextEditingController(text: '14:00');
-    int selectedDay = DateTime.now().day;
+    int selectedDay = 15;
     String selectedPriority = 'HIGH';
     Color selectedColor = AppColors.priorityHigh;
+
+    int maxDays = DateTime(_focusedMonth.year, _focusedMonth.month + 1, 0).day;
+    if (selectedDay > maxDays) selectedDay = maxDays;
 
     showDialog(
       context: context,
@@ -114,9 +189,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(24),
               ),
-              title: const Text(
-                'Add Calendar Deadline',
-                style: TextStyle(fontWeight: FontWeight.bold),
+              title: Text(
+                '${AppStrings.get('add_event')} (${_monthShortNames[_focusedMonth.month - 1]} ${_focusedMonth.year})',
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
               ),
               content: SingleChildScrollView(
                 child: Column(
@@ -144,11 +219,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         Expanded(
                           child: DropdownButtonFormField<int>(
                             initialValue: selectedDay,
-                            decoration: const InputDecoration(labelText: 'Day (Sep)'),
-                            items: List.generate(30, (i) => i + 1).map((d) {
+                            decoration: const InputDecoration(labelText: 'Day'),
+                            items: List.generate(maxDays, (i) => i + 1).map((d) {
                               return DropdownMenuItem<int>(
                                 value: d,
-                                child: Text('Sep $d'),
+                                child: Text('$d ${_monthShortNames[_focusedMonth.month - 1]}'),
                               );
                             }).toList(),
                             onChanged: (val) {
@@ -172,15 +247,15 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       ],
                     ),
                     const SizedBox(height: 16),
-                    const Text(
-                      'Priority Level:',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                    Text(
+                      '${AppStrings.get('priority')}:',
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                     ),
                     const SizedBox(height: 8),
                     Row(
                       children: [
                         _buildPriorityChip(
-                          label: 'LOW',
+                          label: AppStrings.get('low'),
                           color: AppColors.priorityLow,
                           isSelected: selectedPriority == 'LOW',
                           onTap: () {
@@ -192,7 +267,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         ),
                         const SizedBox(width: 8),
                         _buildPriorityChip(
-                          label: 'MEDIUM',
+                          label: AppStrings.get('medium'),
                           color: AppColors.priorityMedium,
                           isSelected: selectedPriority == 'MEDIUM',
                           onTap: () {
@@ -204,7 +279,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         ),
                         const SizedBox(width: 8),
                         _buildPriorityChip(
-                          label: 'HIGH',
+                          label: AppStrings.get('high'),
                           color: AppColors.priorityHigh,
                           isSelected: selectedPriority == 'HIGH',
                           onTap: () {
@@ -222,7 +297,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancel'),
+                  child: Text(AppStrings.get('cancel')),
                 ),
                 ElevatedButton(
                   onPressed: () {
@@ -232,7 +307,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           0,
                           CalendarDeadline(
                             id: DateTime.now().millisecondsSinceEpoch.toString(),
-                            month: 'Sep',
+                            month: _monthShortNames[_focusedMonth.month - 1],
+                            monthNumber: _focusedMonth.month,
+                            year: _focusedMonth.year,
                             day: selectedDay,
                             title: titleController.text.trim(),
                             course: courseController.text.trim(),
@@ -245,7 +322,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       Navigator.pop(context);
                     }
                   },
-                  child: const Text('Add Event'),
+                  child: Text(AppStrings.get('add_event')),
                 ),
               ],
             );
@@ -281,11 +358,80 @@ class _CalendarScreenState extends State<CalendarScreen> {
     );
   }
 
+  List<TableRow> _buildCalendarTableRows(Color cardBg, Color textPrimary, bool isDark) {
+    int daysInMonth = DateTime(_focusedMonth.year, _focusedMonth.month + 1, 0).day;
+    int firstWeekday = DateTime(_focusedMonth.year, _focusedMonth.month, 1).weekday; // 1 = Mon, 7 = Sun
+
+    List<TableRow> rows = [];
+
+    // Header Row
+    rows.add(
+      TableRow(
+        decoration: const BoxDecoration(
+          color: Color(0xFF1E293B),
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(15),
+            topRight: Radius.circular(15),
+          ),
+        ),
+        children: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+            .map((d) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Center(
+                    child: Text(
+                      d,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ))
+            .toList(),
+      ),
+    );
+
+    int dayCounter = 1;
+    int prevMonthDays = DateTime(_focusedMonth.year, _focusedMonth.month, 0).day;
+    int startOffset = firstWeekday - 1;
+
+    for (int row = 0; row < 5; row++) {
+      List<Map<String, dynamic>> cellData = [];
+      for (int col = 0; col < 7; col++) {
+        int cellIndex = row * 7 + col;
+        if (cellIndex < startOffset) {
+          int dayNum = prevMonthDays - (startOffset - cellIndex - 1);
+          cellData.add({'day': '$dayNum', 'dot': null, 'isNext': true});
+        } else if (dayCounter <= daysInMonth) {
+          cellData.add({
+            'day': '$dayCounter',
+            'dot': _getDotForDay(dayCounter),
+            'isNext': false,
+          });
+          dayCounter++;
+        } else {
+          int nextDayNum = dayCounter - daysInMonth;
+          cellData.add({'day': '$nextDayNum', 'dot': null, 'isNext': true});
+          dayCounter++;
+        }
+      }
+      rows.add(_buildCalendarRow(cellData, cardBg, textPrimary, isDark));
+    }
+
+    return rows;
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = AppColors.isDarkMode(context);
     final cardBg = isDark ? AppColors.cardBgDark : Colors.white;
     final textPrimary = isDark ? AppColors.textLight : const Color(0xFF0F172A);
+
+    final currentMonthDeadlines = _deadlines
+        .where((d) =>
+            d.monthNumber == _focusedMonth.month && d.year == _focusedMonth.year)
+        .toList();
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
@@ -298,22 +444,36 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Header
-                  const HeaderBar(title: 'CALENDAR'),
+                  HeaderBar(title: AppStrings.get('calendar')),
+
+                  // Month Navigation Row (< SEPTEMBER 2026 >)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          'SEPTEMBER 2026',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w900,
-                            color: isDark
-                                ? AppColors.textMutedDark
-                                : const Color(0xFF94A3B8),
-                            letterSpacing: 1.0,
-                          ),
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.chevron_left_rounded, size: 28),
+                              onPressed: () => _changeMonth(-1),
+                            ),
+                            Text(
+                              '${_monthNames[_focusedMonth.month - 1]} ${_focusedMonth.year}',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w900,
+                                color: isDark
+                                    ? AppColors.textMutedDark
+                                    : const Color(0xFF94A3B8),
+                                letterSpacing: 0.8,
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.chevron_right_rounded, size: 28),
+                              onPressed: () => _changeMonth(1),
+                            ),
+                          ],
                         ),
                         GestureDetector(
                           onTap: _showAddEventDialog,
@@ -327,12 +487,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Row(
-                              children: const [
-                                Icon(Icons.add, color: Colors.white, size: 16),
-                                SizedBox(width: 4),
+                              children: [
+                                const Icon(Icons.add, color: Colors.white, size: 16),
+                                const SizedBox(width: 4),
                                 Text(
-                                  'Add Event',
-                                  style: TextStyle(
+                                  AppStrings.get('add_event'),
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 12,
@@ -367,74 +527,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                             : const Color(0xFFCBD5E1),
                         width: 1,
                       ),
-                      children: [
-                        // Day of week header row
-                        TableRow(
-                          decoration: const BoxDecoration(
-                            color: Color(0xFF1E293B),
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(15),
-                              topRight: Radius.circular(15),
-                            ),
-                          ),
-                          children: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-                              .map((d) => Padding(
-                                    padding:
-                                        const EdgeInsets.symmetric(vertical: 10),
-                                    child: Center(
-                                      child: Text(
-                                        d,
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ),
-                                  ))
-                              .toList(),
-                        ),
-                        // Row 1
-                        _buildCalendarRow([
-                          {'day': '7', 'dot': _getDotForDay(7)},
-                          {'day': '8', 'dot': _getDotForDay(8)},
-                          {'day': '9', 'dot': _getDotForDay(9)},
-                          {'day': '10', 'dot': _getDotForDay(10)},
-                          {'day': '11', 'dot': _getDotForDay(11)},
-                          {'day': '12', 'dot': _getDotForDay(12)},
-                          {'day': '13', 'dot': _getDotForDay(13)},
-                        ], cardBg, textPrimary, isDark),
-                        // Row 2
-                        _buildCalendarRow([
-                          {'day': '14', 'dot': _getDotForDay(14)},
-                          {'day': '15', 'dot': _getDotForDay(15)},
-                          {'day': '16', 'dot': _getDotForDay(16)},
-                          {'day': '17', 'dot': _getDotForDay(17)},
-                          {'day': '18', 'dot': _getDotForDay(18)},
-                          {'day': '19', 'dot': _getDotForDay(19)},
-                          {'day': '20', 'dot': _getDotForDay(20)},
-                        ], cardBg, textPrimary, isDark),
-                        // Row 3
-                        _buildCalendarRow([
-                          {'day': '21', 'dot': _getDotForDay(21)},
-                          {'day': '22', 'dot': _getDotForDay(22)},
-                          {'day': '23', 'dot': _getDotForDay(23)},
-                          {'day': '24', 'dot': _getDotForDay(24)},
-                          {'day': '25', 'dot': _getDotForDay(25)},
-                          {'day': '26', 'dot': _getDotForDay(26)},
-                          {'day': '27', 'dot': _getDotForDay(27)},
-                        ], cardBg, textPrimary, isDark),
-                        // Row 4
-                        _buildCalendarRow([
-                          {'day': '29', 'dot': _getDotForDay(29)},
-                          {'day': '30', 'dot': _getDotForDay(30)},
-                          {'day': '1', 'dot': null, 'isNext': true},
-                          {'day': '2', 'dot': null, 'isNext': true},
-                          {'day': '3', 'dot': null, 'isNext': true},
-                          {'day': '4', 'dot': null, 'isNext': true},
-                          {'day': '5', 'dot': null, 'isNext': true},
-                        ], cardBg, textPrimary, isDark),
-                      ],
+                      children: _buildCalendarTableRows(cardBg, textPrimary, isDark),
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -443,7 +536,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Text(
-                      'UPCOMING DEADLINE',
+                      AppStrings.get('upcoming_deadline'),
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w900,
@@ -457,19 +550,33 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   // Upcoming Deadline Cards List
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Column(
-                      children: _deadlines.map((item) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: _buildDeadlineCard(
-                            item: item,
-                            cardBg: cardBg,
-                            textPrimary: textPrimary,
-                            isDark: isDark,
+                    child: currentMonthDeadlines.isEmpty
+                        ? Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 20),
+                            child: Center(
+                              child: Text(
+                                'No deadlines scheduled for ${_monthNames[_focusedMonth.month - 1]}!',
+                                style: TextStyle(
+                                  color: isDark
+                                      ? AppColors.textMutedDark
+                                      : AppColors.textMuted,
+                                ),
+                              ),
+                            ),
+                          )
+                        : Column(
+                            children: currentMonthDeadlines.map((item) {
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 12),
+                                child: _buildDeadlineCard(
+                                  item: item,
+                                  cardBg: cardBg,
+                                  textPrimary: textPrimary,
+                                  isDark: isDark,
+                                ),
+                              );
+                            }).toList(),
                           ),
-                        );
-                      }).toList(),
-                    ),
                   ),
                 ],
               ),

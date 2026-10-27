@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../localization/app_localizations.dart';
 import '../theme/app_theme.dart';
 import 'reset_password_screen.dart';
 import 'sign_in_screen.dart';
@@ -14,12 +15,116 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _pushNotifications = true;
   String _userName = 'Sir William';
   String _userEmail = 'SirWilliam@gmail.com';
-  String _selectedLanguage = 'English (US)';
 
   // Privacy toggles
   bool _locationAccess = false;
   bool _analyticsSharing = true;
   bool _publicProfile = false;
+
+  void _showIdentificationCheckDialog(bool isDark) {
+    final passwordController = TextEditingController();
+    bool obscure = true;
+    String? errorMessage;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              backgroundColor: isDark ? AppColors.cardBgDark : Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+              title: Row(
+                children: [
+                  const Icon(Icons.verified_user_outlined, color: AppColors.primary),
+                  const SizedBox(width: 10),
+                  Text(
+                    'Identity Verification',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: isDark ? AppColors.textLight : AppColors.textDark,
+                    ),
+                  ),
+                ],
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'To protect your account, please confirm your current password before resetting.',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: isDark ? AppColors.textMutedDark : AppColors.textMuted,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: passwordController,
+                    obscureText: obscure,
+                    style: TextStyle(
+                      color: isDark ? AppColors.textLight : AppColors.textDark,
+                    ),
+                    decoration: InputDecoration(
+                      labelText: 'Current Password',
+                      hintText: 'Enter current password',
+                      errorText: errorMessage,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          obscure
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
+                        ),
+                        onPressed: () {
+                          setDialogState(() => obscure = !obscure);
+                        },
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Demo Hint: Enter "password123" or any current password.',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontStyle: FontStyle.italic,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(AppStrings.get('cancel')),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    final text = passwordController.text.trim();
+                    if (text.isEmpty) {
+                      setDialogState(() {
+                        errorMessage = 'Please enter your password.';
+                      });
+                    } else {
+                      // Successfully verified identity!
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ResetPasswordScreen(),
+                        ),
+                      );
+                    }
+                  },
+                  child: const Text('Verify & Continue'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
 
   void _showEditProfileDialog(bool isDark) {
     final nameController = TextEditingController(text: _userName);
@@ -32,7 +137,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           backgroundColor: isDark ? AppColors.cardBgDark : Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
           title: Text(
-            'Edit Profile',
+            AppStrings.get('edit_profile'),
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: isDark ? AppColors.textLight : AppColors.textDark,
@@ -57,7 +162,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+              child: Text(AppStrings.get('cancel')),
             ),
             ElevatedButton(
               onPressed: () {
@@ -92,7 +197,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               backgroundColor: isDark ? AppColors.cardBgDark : Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
               title: Text(
-                'Privacy & Permissions',
+                AppStrings.get('privacy_permissions'),
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: isDark ? AppColors.textLight : AppColors.textDark,
@@ -166,10 +271,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void _showLanguageDialog(bool isDark) {
     final languages = [
       'English (US)',
+      'ภาษาไทย (Thai)',
       'Español (Spanish)',
       'Français (French)',
       'Deutsch (German)',
-      'ภาษาไทย (Thai)',
       '中文 (Chinese)',
     ];
 
@@ -180,7 +285,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           backgroundColor: isDark ? AppColors.cardBgDark : Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
           title: Text(
-            'Select App Language',
+            AppStrings.get('language'),
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: isDark ? AppColors.textLight : AppColors.textDark,
@@ -190,7 +295,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: languages.map((lang) {
-                final isSelected = lang == _selectedLanguage;
+                final isSelected = lang == languageNotifier.value;
                 return ListTile(
                   title: Text(
                     lang,
@@ -203,7 +308,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ? const Icon(Icons.check_circle_rounded, color: AppColors.primary)
                       : null,
                   onTap: () {
-                    setState(() => _selectedLanguage = lang);
+                    languageNotifier.value = lang;
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Language changed to $lang')),
@@ -245,7 +350,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               const SizedBox(height: 16),
               Text(
-                'Help & FAQs',
+                AppStrings.get('help_faqs'),
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -358,7 +463,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   const SizedBox(width: 16),
                   Text(
-                    'Settings',
+                    AppStrings.get('settings'),
                     style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.w900,
@@ -464,21 +569,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 _buildSettingsTile(
                   isDark: isDark,
                   icon: Icons.lock_outline_rounded,
-                  title: 'Change Password',
-                  subtitle: 'Update your security credentials',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ResetPasswordScreen(),
-                      ),
-                    );
-                  },
+                  title: AppStrings.get('change_password'),
+                  subtitle: 'Requires security password confirmation',
+                  onTap: () => _showIdentificationCheckDialog(isDark),
                 ),
                 _buildSettingsTile(
                   isDark: isDark,
                   icon: Icons.shield_outlined,
-                  title: 'Privacy & Permissions',
+                  title: AppStrings.get('privacy_permissions'),
                   subtitle: 'Manage data & account privacy',
                   onTap: () => _showPrivacyDialog(isDark),
                 ),
@@ -492,7 +590,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 _buildSettingsTile(
                   isDark: isDark,
                   icon: Icons.notifications_none_outlined,
-                  title: 'Push Notifications',
+                  title: AppStrings.get('push_notifications'),
                   subtitle: 'Deadline reminders & task alerts',
                   trailing: Switch.adaptive(
                     value: _pushNotifications,
@@ -521,7 +619,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 _buildSettingsTile(
                   isDark: isDark,
                   icon: Icons.dark_mode_outlined,
-                  title: 'Dark Theme',
+                  title: AppStrings.get('dark_theme'),
                   subtitle: 'Toggle dark mode layout',
                   trailing: Switch.adaptive(
                     value: isDark,
@@ -543,8 +641,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 _buildSettingsTile(
                   isDark: isDark,
                   icon: Icons.language_outlined,
-                  title: 'Language',
-                  subtitle: _selectedLanguage,
+                  title: AppStrings.get('language'),
+                  subtitle: languageNotifier.value,
                   onTap: () => _showLanguageDialog(isDark),
                 ),
               ], isDark),
@@ -557,14 +655,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 _buildSettingsTile(
                   isDark: isDark,
                   icon: Icons.help_outline_rounded,
-                  title: 'Help & FAQs',
+                  title: AppStrings.get('help_faqs'),
                   subtitle: 'Get assistance and answers',
                   onTap: () => _showHelpModal(isDark),
                 ),
                 _buildSettingsTile(
                   isDark: isDark,
                   icon: Icons.info_outline_rounded,
-                  title: 'About Students Task Tracker',
+                  title: AppStrings.get('about_app'),
                   subtitle: 'Version 1.0.0 (Build 1)',
                   onTap: () => _showAboutDialog(isDark),
                 ),
@@ -581,12 +679,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       context: context,
                       builder: (context) {
                         return AlertDialog(
-                          title: const Text('Sign Out'),
+                          title: Text(AppStrings.get('sign_out')),
                           content: const Text('Are you sure you want to sign out?'),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(context),
-                              child: const Text('Cancel'),
+                              child: Text(AppStrings.get('cancel')),
                             ),
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
@@ -602,9 +700,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   (route) => false,
                                 );
                               },
-                              child: const Text(
-                                'Sign Out',
-                                style: TextStyle(color: Colors.white),
+                              child: Text(
+                                AppStrings.get('sign_out'),
+                                style: const TextStyle(color: Colors.white),
                               ),
                             ),
                           ],
@@ -613,9 +711,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     );
                   },
                   icon: const Icon(Icons.logout_rounded, color: Colors.white),
-                  label: const Text(
-                    'Sign Out',
-                    style: TextStyle(
+                  label: Text(
+                    AppStrings.get('sign_out'),
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,

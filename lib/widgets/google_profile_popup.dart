@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../localization/app_localizations.dart';
 import '../pages/settings_screen.dart';
 import '../pages/sign_in_screen.dart';
 import '../theme/app_theme.dart';
@@ -149,9 +150,9 @@ class _GoogleProfilePopupDialogState extends State<GoogleProfilePopupDialog> {
                   );
                 },
                 icon: const Icon(Icons.manage_accounts_outlined, size: 18),
-                label: const Text(
-                  'Manage your Profile',
-                  style: TextStyle(
+                label: Text(
+                  AppStrings.get('manage_profile'),
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
@@ -195,7 +196,7 @@ class _GoogleProfilePopupDialogState extends State<GoogleProfilePopupDialog> {
               _buildPopupOption(
                 isDark: isDark,
                 icon: Icons.settings_outlined,
-                title: 'Settings',
+                title: AppStrings.get('settings'),
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.push(
@@ -209,7 +210,7 @@ class _GoogleProfilePopupDialogState extends State<GoogleProfilePopupDialog> {
               _buildPopupOption(
                 isDark: isDark,
                 icon: Icons.dark_mode_outlined,
-                title: 'Dark Theme',
+                title: AppStrings.get('dark_theme'),
                 trailing: Switch.adaptive(
                   value: isDark,
                   activeTrackColor: AppColors.primary,
@@ -228,7 +229,7 @@ class _GoogleProfilePopupDialogState extends State<GoogleProfilePopupDialog> {
               _buildPopupOption(
                 isDark: isDark,
                 icon: Icons.help_outline_rounded,
-                title: 'Help & Feedback',
+                title: AppStrings.get('help_faqs'),
                 onTap: () {},
               ),
 
@@ -243,7 +244,7 @@ class _GoogleProfilePopupDialogState extends State<GoogleProfilePopupDialog> {
               _buildPopupOption(
                 isDark: isDark,
                 icon: Icons.logout_rounded,
-                title: 'Sign Out',
+                title: AppStrings.get('sign_out'),
                 textColor: Colors.redAccent,
                 iconColor: Colors.redAccent,
                 onTap: () {

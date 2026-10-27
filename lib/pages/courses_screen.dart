@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../localization/app_localizations.dart';
 import '../models/course_model.dart';
 import '../theme/app_theme.dart';
 import '../widgets/header_bar.dart';
@@ -104,7 +105,7 @@ class _CoursesScreenState extends State<CoursesScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Add New Course'),
+          title: Text(AppStrings.get('add_course')),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -133,7 +134,7 @@ class _CoursesScreenState extends State<CoursesScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+              child: Text(AppStrings.get('cancel')),
             ),
             ElevatedButton(
               onPressed: () {
@@ -158,7 +159,7 @@ class _CoursesScreenState extends State<CoursesScreen> {
                   Navigator.pop(context);
                 }
               },
-              child: const Text('Add Course'),
+              child: Text(AppStrings.get('add_course')),
             ),
           ],
         );
@@ -175,14 +176,14 @@ class _CoursesScreenState extends State<CoursesScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            const HeaderBar(title: 'COURSES'),
+            HeaderBar(title: AppStrings.get('courses')),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    '${_courses.length} Active Courses',
+                    '${_courses.length} ${AppStrings.get('active_courses')}',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -203,12 +204,12 @@ class _CoursesScreenState extends State<CoursesScreen> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Row(
-                        children: const [
-                          Icon(Icons.add, color: Colors.white, size: 18),
-                          SizedBox(width: 4),
+                        children: [
+                          const Icon(Icons.add, color: Colors.white, size: 18),
+                          const SizedBox(width: 4),
                           Text(
-                            'Add Course',
-                            style: TextStyle(
+                            AppStrings.get('add_course'),
+                            style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
                               fontSize: 13,
@@ -314,7 +315,7 @@ class _CoursesScreenState extends State<CoursesScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Progress',
+                    AppStrings.get('progress'),
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w900,
@@ -336,7 +337,7 @@ class _CoursesScreenState extends State<CoursesScreen> {
 
                   // Current Completed Stats
                   Text(
-                    '${course.completedAssignments} Assignment',
+                    '${course.completedAssignments} ${AppStrings.get('assignment')}',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
@@ -344,7 +345,7 @@ class _CoursesScreenState extends State<CoursesScreen> {
                     ),
                   ),
                   Text(
-                    '${course.completedTests} Test',
+                    '${course.completedTests} ${AppStrings.get('test')}',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -365,7 +366,7 @@ class _CoursesScreenState extends State<CoursesScreen> {
 
                   // Total Stats
                   Text(
-                    'Total',
+                    AppStrings.get('total'),
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w900,
@@ -373,7 +374,7 @@ class _CoursesScreenState extends State<CoursesScreen> {
                     ),
                   ),
                   Text(
-                    '${course.totalAssignments} Assignment',
+                    '${course.totalAssignments} ${AppStrings.get('assignment')}',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
@@ -381,7 +382,7 @@ class _CoursesScreenState extends State<CoursesScreen> {
                     ),
                   ),
                   Text(
-                    '${course.totalTests} Test',
+                    '${course.totalTests} ${AppStrings.get('test')}',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
