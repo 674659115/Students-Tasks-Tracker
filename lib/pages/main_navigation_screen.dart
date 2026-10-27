@@ -90,15 +90,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
         final List<Widget> pages = [
           HomeScreen(
-            key: ValueKey('home_$currentLang'),
             tasks: _tasks,
             onTaskAdded: _addNewTask,
             onTaskToggled: _toggleTask,
             onTaskDeleted: _deleteTask,
           ),
-          CoursesScreen(key: ValueKey('courses_$currentLang')),
-          CalendarScreen(key: ValueKey('calendar_$currentLang')),
-          AnalyticalScreen(key: ValueKey('profile_$currentLang')),
+          const CoursesScreen(),
+          const CalendarScreen(),
+          const AnalyticalScreen(),
         ];
 
         return Scaffold(
