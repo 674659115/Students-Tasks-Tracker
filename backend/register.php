@@ -1,7 +1,12 @@
 <?php
 require_once "db_config.php";
 
-$data = json_decode(file_get_contents("php://input"), true);
+$rawInput = file_get_contents("php://input");
+$data = json_decode($rawInput, true);
+
+if (!$data) {
+    $data = $_POST;
+}
 
 $name = trim($data["name"] ?? "");
 $email = trim($data["email"] ?? "");
@@ -12,7 +17,7 @@ if (empty($name) || empty($email) || empty($password)) {
     exit();
 }
 
-// Check if name has first name and surname (at least two words)
+// Name & Surname Check (at least two words)
 $nameParts = array_filter(explode(" ", $name));
 if (count($nameParts) < 2) {
     echo json_encode(["status" => "error", "message" => "Please enter both First Name and Surname (e.g. John Doe)."]);
@@ -30,7 +35,7 @@ if ($result->num_rows > 0) {
     exit();
 }
 
-// Insert user
+// Insert user into MySQL database
 $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 $stmt = $conn->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
 $stmt->bind_param("sss", $name, $email, $hashedPassword);
@@ -47,6 +52,6 @@ if ($stmt->execute()) {
         ]
     ]);
 } else {
-    echo json_encode(["status" => "error", "message" => "Failed to create user account."]);
+    echo json_encode(["status" => "error", "message" => "Failed to create user account: " . $conn->error]);
 }
 ?>

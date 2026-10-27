@@ -1,7 +1,12 @@
 <?php
 require_once "db_config.php";
 
-$data = json_decode(file_get_contents("php://input"), true);
+$rawInput = file_get_contents("php://input");
+$data = json_decode($rawInput, true);
+
+if (!$data) {
+    $data = $_POST;
+}
 
 $email = trim($data["email"] ?? "");
 $password = trim($data["password"] ?? "");

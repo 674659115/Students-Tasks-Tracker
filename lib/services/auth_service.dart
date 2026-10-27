@@ -29,7 +29,7 @@ class UserModel {
 
 class AuthService {
   // Base URL for XAMPP PHP API
-  // 10.0.2.2 points to host machine localhost from Android Emulator
+  // Use 10.0.2.2 for Android Emulator, localhost for Windows Desktop/Web, or your Wi-Fi IP for real phones
   static String baseUrl = 'http://10.0.2.2/students_tasks_tracker_api';
 
   static final ValueNotifier<UserModel?> currentUserNotifier =
@@ -104,6 +104,10 @@ class AuthService {
           )
           .timeout(const Duration(seconds: 4));
 
+      if (kDebugMode) {
+        print('XAMPP Login Response [${response.statusCode}]: ${response.body}');
+      }
+
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
         if (data['status'] == 'success') {
@@ -118,12 +122,15 @@ class AuthService {
         }
       }
     } catch (e) {
+      if (kDebugMode) {
+        print('XAMPP Connection Note: $e');
+      }
       // Fallback: If XAMPP backend is not running or unreachable, check local saved user
       if (currentUser != null &&
           currentUser!.email.toLowerCase() == cleanEmail.toLowerCase()) {
         return {'success': true, 'user': currentUser};
       }
-      // Offline fallback account for testing
+      // Default demo account
       if (cleanEmail.toLowerCase() == 'sirwilliam@gmail.com' &&
           cleanPassword.isNotEmpty) {
         final user = UserModel(
@@ -196,6 +203,10 @@ class AuthService {
           )
           .timeout(const Duration(seconds: 4));
 
+      if (kDebugMode) {
+        print('XAMPP Register Response [${response.statusCode}]: ${response.body}');
+      }
+
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
         if (data['status'] == 'success') {
@@ -210,6 +221,9 @@ class AuthService {
         }
       }
     } catch (e) {
+      if (kDebugMode) {
+        print('XAMPP Connection Note: $e');
+      }
       // Fallback: Save local user if XAMPP is offline
       final user = UserModel(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
