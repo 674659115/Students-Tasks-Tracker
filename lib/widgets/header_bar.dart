@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import 'google_profile_popup.dart';
+import 'notifications_modal.dart';
 
 class HeaderBar extends StatelessWidget {
   final String title;
@@ -52,50 +53,53 @@ class HeaderBar extends StatelessWidget {
           // Action Icons (Bell Notification & Avatar)
           Row(
             children: [
-              // Notification Bell Card
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: cardBg,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.03),
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    Stack(
-                      children: [
-                        Icon(
-                          Icons.notifications_none_outlined,
-                          size: 24,
-                          color: textPrimary,
-                        ),
-                        Positioned(
-                          right: 1,
-                          top: 1,
-                          child: Container(
-                            width: 9,
-                            height: 9,
-                            decoration: const BoxDecoration(
-                              color: Colors.red,
-                              shape: BoxShape.circle,
+              // Notification Bell Card (Clickable to show Notifications Modal)
+              GestureDetector(
+                onTap: () => showNotificationsModal(context),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: cardBg,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.03),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Stack(
+                        children: [
+                          Icon(
+                            Icons.notifications_none_outlined,
+                            size: 24,
+                            color: textPrimary,
+                          ),
+                          Positioned(
+                            right: 1,
+                            top: 1,
+                            child: Container(
+                              width: 9,
+                              height: 9,
+                              decoration: const BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(width: 4),
-                    Icon(
-                      Icons.keyboard_arrow_down,
-                      size: 20,
-                      color: isDark ? AppColors.textMutedDark : const Color(0xFF64748B),
-                    ),
-                  ],
+                        ],
+                      ),
+                      const SizedBox(width: 4),
+                      Icon(
+                        Icons.keyboard_arrow_down,
+                        size: 20,
+                        color: isDark ? AppColors.textMutedDark : const Color(0xFF64748B),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(width: 12),
