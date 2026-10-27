@@ -30,6 +30,7 @@ class AppStrings {
     'courses': 'Courses',
     'calendar': 'Calendar',
     'profile': 'Profile',
+    'analytical': 'ANALYTICAL',
     'settings': 'Settings',
     'app_account_settings': 'App & Account Settings',
     'manage_settings_sub': 'Manage password, notifications & preferences',
@@ -52,6 +53,14 @@ class AppStrings {
     'low': 'LOW',
     'medium': 'MEDIUM',
     'high': 'HIGH',
+    'high_priority': 'HIGH',
+    'medium_priority': 'MEDIUM',
+    'low_priority': 'LOW',
+    'due_today': 'Due Today 23:59',
+    'due_tomorrow': 'Due Tomorrow 23:59',
+    'due_yesterday': 'Due Yesterday',
+    'overdue': 'Overdue',
+    'due': 'Due',
     'upcoming_deadline': 'UPCOMING DEADLINE',
     'add_event': 'Add Event',
     'notifications': 'Notifications',
@@ -78,6 +87,7 @@ class AppStrings {
     'courses': 'รายวิชา',
     'calendar': 'ปฏิทิน',
     'profile': 'โปรไฟล์',
+    'analytical': 'การวิเคราะห์',
     'settings': 'การตั้งค่า',
     'app_account_settings': 'การตั้งค่าแอปและบัญชี',
     'manage_settings_sub': 'จัดการรหัสผ่าน การแจ้งเตือน และตัวเลือก',
@@ -100,6 +110,14 @@ class AppStrings {
     'low': 'ต่ำ',
     'medium': 'ปานกลาง',
     'high': 'สูง',
+    'high_priority': 'สูง',
+    'medium_priority': 'ปานกลาง',
+    'low_priority': 'ต่ำ',
+    'due_today': 'กำหนดส่งวันนี้ 23:59',
+    'due_tomorrow': 'กำหนดส่งพรุ่งนี้ 23:59',
+    'due_yesterday': 'กำหนดส่งเมื่อวาน',
+    'overdue': 'เกินกำหนดส่ง',
+    'due': 'กำหนดส่ง',
     'upcoming_deadline': 'กำหนดส่งที่กำลังจะมาถึง',
     'add_event': 'เพิ่มกิจกรรม',
     'notifications': 'การแจ้งเตือน',
@@ -126,6 +144,7 @@ class AppStrings {
     'courses': 'Cursos',
     'calendar': 'Calendario',
     'profile': 'Perfil',
+    'analytical': 'ANÁLISIS',
     'settings': 'Ajustes',
     'change_password': 'Cambiar contraseña',
     'push_notifications': 'Notificaciones',
@@ -133,6 +152,14 @@ class AppStrings {
     'language': 'Idioma',
     'add_task': 'AÑADIR TAREA',
     'upcoming_deadline': 'PRÓXIMAS ENTREGAS',
+    'high_priority': 'ALTA',
+    'medium_priority': 'MEDIA',
+    'low_priority': 'BAJA',
+    'due_today': 'Entrega Hoy 23:59',
+    'due_tomorrow': 'Entrega Mañana 23:59',
+    'due_yesterday': 'Entrega Ayer',
+    'overdue': 'Atrasado',
+    'due': 'Vence',
   };
 
   static const Map<String, String> _french = {
@@ -146,6 +173,11 @@ class AppStrings {
     'calendar': 'Calendrier',
     'profile': 'Profil',
     'settings': 'Paramètres',
+    'high_priority': 'HAUTE',
+    'medium_priority': 'MOYENNE',
+    'low_priority': 'BASSE',
+    'due_today': 'Aujourd\'hui 23:59',
+    'due_tomorrow': 'Demain 23:59',
   };
 
   static const Map<String, String> _german = {
@@ -159,6 +191,9 @@ class AppStrings {
     'calendar': 'Kalender',
     'profile': 'Profil',
     'settings': 'Einstellungen',
+    'high_priority': 'HOCH',
+    'medium_priority': 'MITTEL',
+    'low_priority': 'NIEDRIG',
   };
 
   static const Map<String, String> _chinese = {
@@ -172,5 +207,10 @@ class AppStrings {
     'calendar': '日历',
     'profile': '个人中心',
     'settings': '设置',
+    'high_priority': '高',
+    'medium_priority': '中',
+    'low_priority': '低',
+    'due_today': '今天 23:59',
+    'due_tomorrow': '明天 23:59',
   };
 }

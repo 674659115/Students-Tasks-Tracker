@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../localization/app_localizations.dart';
 import '../models/task_model.dart';
 import '../theme/app_theme.dart';
 import '../widgets/primary_button.dart';
@@ -10,17 +11,17 @@ String formatFriendlyDate(DateTime date) {
   final difference = target.difference(today).inDays;
 
   if (difference == 0) {
-    return 'Due Today 23:59';
+    return AppStrings.get('due_today');
   } else if (difference == 1) {
-    return 'Due Tomorrow 23:59';
+    return AppStrings.get('due_tomorrow');
   } else if (difference == -1) {
-    return 'Due Yesterday';
+    return AppStrings.get('due_yesterday');
   } else if (difference < 0) {
-    return 'Overdue (${date.day}/${date.month}/${date.year})';
+    return '${AppStrings.get('overdue')} (${date.day}/${date.month}/${date.year})';
   } else {
     final daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     final dayName = daysOfWeek[date.weekday - 1];
-    return 'Due $dayName ${date.day}/${date.month}/${date.year}';
+    return '${AppStrings.get('due')} $dayName ${date.day}/${date.month}/${date.year}';
   }
 }
 
@@ -116,7 +117,7 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                   ),
                   Center(
                     child: Text(
-                      'ADD TASK',
+                      AppStrings.get('add_task'),
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w900,
@@ -130,7 +131,7 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
 
               // Task Title Label & Input
               Text(
-                'TASK TITLE',
+                AppStrings.get('task_title'),
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
@@ -158,7 +159,7 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
 
               // Courses Label & Dropdown
               Text(
-                'COURSES',
+                AppStrings.get('courses_label'),
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
@@ -212,7 +213,7 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
 
               // Date Label & Picker
               Text(
-                'DATE',
+                AppStrings.get('date_label'),
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
@@ -263,7 +264,7 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
 
               // Priority Label & Selection Buttons
               Text(
-                'PRIORITY',
+                AppStrings.get('priority'),
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
@@ -276,7 +277,7 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                   Expanded(
                     child: _buildPriorityButton(
                       priority: TaskPriority.low,
-                      label: 'LOW',
+                      label: AppStrings.get('low'),
                       activeColor: const Color(0xFF4CAF50),
                       isDark: isDark,
                     ),
@@ -285,7 +286,7 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                   Expanded(
                     child: _buildPriorityButton(
                       priority: TaskPriority.medium,
-                      label: 'MEDIUM',
+                      label: AppStrings.get('medium'),
                       activeColor: const Color(0xFFFFB300),
                       isDark: isDark,
                     ),
@@ -294,7 +295,7 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                   Expanded(
                     child: _buildPriorityButton(
                       priority: TaskPriority.high,
-                      label: 'HIGH',
+                      label: AppStrings.get('high'),
                       activeColor: const Color(0xFFFF3B30),
                       isDark: isDark,
                     ),
@@ -305,7 +306,7 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
 
               // Create Task Button
               PrimaryButton(
-                text: 'CREATE TASK',
+                text: AppStrings.get('create_task'),
                 onPressed: () {
                   final newTitle = _titleController.text.trim().isEmpty
                       ? 'New Task'
@@ -329,9 +330,9 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
               Center(
                 child: GestureDetector(
                   onTap: () => Navigator.pop(context),
-                  child: const Text(
-                    'CANCEL',
-                    style: TextStyle(
+                  child: Text(
+                    AppStrings.get('cancel'),
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF1E67C6),

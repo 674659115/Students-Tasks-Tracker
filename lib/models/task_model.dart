@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../localization/app_localizations.dart';
 
 enum TaskPriority { low, medium, high }
 
@@ -26,11 +27,11 @@ class TaskModel {
   String get priorityText {
     switch (priority) {
       case TaskPriority.low:
-        return 'LOW';
+        return AppStrings.get('low_priority');
       case TaskPriority.medium:
-        return 'MEDIUM';
+        return AppStrings.get('medium_priority');
       case TaskPriority.high:
-        return 'HIGH';
+        return AppStrings.get('high_priority');
     }
   }
 }

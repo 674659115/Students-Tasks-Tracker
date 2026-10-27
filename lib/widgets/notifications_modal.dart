@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../localization/app_localizations.dart';
 import '../theme/app_theme.dart';
 
 class NotificationItem {
@@ -46,8 +47,8 @@ class _NotificationsModalContentState extends State<NotificationsModalContent> {
       id: '1',
       title: 'IoT & Mobile App Project',
       course: 'IoT & Mobile App Dev',
-      dueTime: 'Due Today 23:59',
-      priority: 'HIGH',
+      dueTime: AppStrings.get('due_today'),
+      priority: AppStrings.get('high_priority'),
       priorityColor: AppColors.priorityHigh,
       isUrgent: true,
     ),
@@ -55,8 +56,8 @@ class _NotificationsModalContentState extends State<NotificationsModalContent> {
       id: '2',
       title: 'Control System Homework 3',
       course: 'Control System Engineering',
-      dueTime: 'Due Today 23:59',
-      priority: 'LOW',
+      dueTime: AppStrings.get('due_today'),
+      priority: AppStrings.get('low_priority'),
       priorityColor: AppColors.priorityLow,
       isUrgent: true,
     ),
@@ -64,8 +65,8 @@ class _NotificationsModalContentState extends State<NotificationsModalContent> {
       id: '3',
       title: 'Electronics Lab Prep',
       course: 'Electronic Engineering',
-      dueTime: 'Due Tomorrow 23:59',
-      priority: 'MEDIUM',
+      dueTime: AppStrings.get('due_tomorrow'),
+      priority: AppStrings.get('medium_priority'),
       priorityColor: AppColors.priorityMedium,
       isUrgent: false,
     ),
@@ -73,8 +74,8 @@ class _NotificationsModalContentState extends State<NotificationsModalContent> {
       id: '4',
       title: 'MidTerm Exam - Eng A+',
       course: 'English Comm. A+',
-      dueTime: 'Due in 2 days (13:30)',
-      priority: 'HIGH',
+      dueTime: '${AppStrings.get('due')} Sep 8 (13:30)',
+      priority: AppStrings.get('high_priority'),
       priorityColor: AppColors.priorityHigh,
       isUrgent: false,
     ),
@@ -82,8 +83,8 @@ class _NotificationsModalContentState extends State<NotificationsModalContent> {
       id: '5',
       title: 'Data Structures Quiz 2',
       course: 'Data Structures & Algorithms',
-      dueTime: 'Due Sep 16 (11:00)',
-      priority: 'MEDIUM',
+      dueTime: '${AppStrings.get('due')} Sep 16 (11:00)',
+      priority: AppStrings.get('medium_priority'),
       priorityColor: AppColors.priorityMedium,
       isUrgent: false,
     ),
@@ -126,7 +127,7 @@ class _NotificationsModalContentState extends State<NotificationsModalContent> {
                 Row(
                   children: [
                     Text(
-                      'Notifications',
+                      AppStrings.get('notifications'),
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w900,
@@ -145,7 +146,7 @@ class _NotificationsModalContentState extends State<NotificationsModalContent> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
-                          '$unreadCount New',
+                          '$unreadCount',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 12,
