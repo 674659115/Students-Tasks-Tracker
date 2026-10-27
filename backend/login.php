@@ -1,4 +1,7 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 require_once "db_config.php";
 
 $rawInput = file_get_contents("php://input");
@@ -17,6 +20,11 @@ if (empty($email) || empty($password)) {
 }
 
 $stmt = $conn->prepare("SELECT id, name, email, password FROM users WHERE email = ?");
+if (!$stmt) {
+    echo json_encode(["status" => "error", "message" => "SQL Prepare Error: " . $conn->error]);
+    exit();
+}
+
 $stmt->bind_param("s", $email);
 $stmt->execute();
 $result = $stmt->get_result();
