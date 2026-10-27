@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../localization/app_localizations.dart';
 import '../models/task_model.dart';
+import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/header_bar.dart';
 import '../widgets/charts.dart';
@@ -71,173 +72,190 @@ class _HomeScreenState extends State<HomeScreen> {
     return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 
+  String _getGreetingText(String userName) {
+    final lang = languageNotifier.value;
+    if (lang.contains('Thai') || lang.contains('ไทย')) {
+      return 'ยินดีต้อนรับ, คุณ $userName!';
+    } else if (lang.contains('Español') || lang.contains('Spanish')) {
+      return '¡Bienvenido, $userName!';
+    } else if (lang.contains('Français') || lang.contains('French')) {
+      return 'Bienvenue, $userName!';
+    } else if (lang.contains('Deutsch') || lang.contains('German')) {
+      return 'Willkommen, $userName!';
+    } else if (lang.contains('中文') || lang.contains('Chinese')) {
+      return '欢迎，$userName！';
+    }
+    return 'Welcome, $userName!';
+  }
+
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<String>(
-      valueListenable: languageNotifier,
-      builder: (context, currentLang, child) {
-        final isDark = AppColors.isDarkMode(context);
-        final cardBg = isDark ? AppColors.cardBgDark : Colors.white;
-        final textPrimary = isDark ? AppColors.textLight : const Color(0xFF0F172A);
+    final isDark = AppColors.isDarkMode(context);
+    final cardBg = isDark ? AppColors.cardBgDark : Colors.white;
+    final textPrimary = isDark ? AppColors.textLight : const Color(0xFF0F172A);
 
-        // TODAY TASKS Calculations
-        final now = DateTime.now();
-        final todayTasks =
-            widget.tasks.where((t) => _isSameDay(t.dueDate, now)).toList();
-        final todayCompleted = todayTasks.where((t) => t.isCompleted).length;
-        final todayTotal = todayTasks.length;
-        final todayProgress =
-            todayTotal == 0 ? 0.0 : (todayCompleted / todayTotal);
+    // TODAY TASKS Calculations
+    final now = DateTime.now();
+    final todayTasks =
+        widget.tasks.where((t) => _isSameDay(t.dueDate, now)).toList();
+    final todayCompleted = todayTasks.where((t) => t.isCompleted).length;
+    final todayTotal = todayTasks.length;
+    final todayProgress =
+        todayTotal == 0 ? 0.0 : (todayCompleted / todayTotal);
 
-        // WEEKLY / TOTAL TASKS Calculations
-        final weeklyCompleted = widget.tasks.where((t) => t.isCompleted).length;
-        final weeklyTotal = widget.tasks.length;
-        final weeklyProgress =
-            weeklyTotal == 0 ? 0.0 : (weeklyCompleted / weeklyTotal);
+    // WEEKLY / TOTAL TASKS Calculations
+    final weeklyCompleted = widget.tasks.where((t) => t.isCompleted).length;
+    final weeklyTotal = widget.tasks.length;
+    final weeklyProgress =
+        weeklyTotal == 0 ? 0.0 : (weeklyCompleted / weeklyTotal);
 
-        return Scaffold(
-          backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
-          body: SafeArea(
-            child: Stack(
-              children: [
-                SingleChildScrollView(
-                  padding: const EdgeInsets.only(bottom: 90),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Top Header
-                      HeaderBar(
+    return Scaffold(
+      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      body: SafeArea(
+        child: Stack(
+          children: [
+            SingleChildScrollView(
+              padding: const EdgeInsets.only(bottom: 90),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Top Header with Real User Name Greeting
+                  ValueListenableBuilder<UserModel?>(
+                    valueListenable: AuthService.currentUserNotifier,
+                    builder: (context, user, child) {
+                      final name = user?.name ?? 'User';
+                      return HeaderBar(
                         subtitle: formatHeaderDate(),
-                        title: AppStrings.get('welcome_user'),
-                      ),
-                      const SizedBox(height: 12),
-
-                      // Stats Cards Row
-                      SizedBox(
-                        height: 124,
-                        child: ListView(
-                          scrollDirection: Axis.horizontal,
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          children: [
-                            _buildStatCard(
-                              context: context,
-                              title: AppStrings.get('today_tasks'),
-                              completed: todayCompleted,
-                              total: todayTotal,
-                              progress: todayProgress,
-                              activeColor: const Color(0xFF3B82F6),
-                              activeSecondaryColor: const Color(0xFFA855F7),
-                              cardBg: cardBg,
-                              textPrimary: textPrimary,
-                            ),
-                            const SizedBox(width: 14),
-                            _buildStatCard(
-                              context: context,
-                              title: AppStrings.get('weekly_tasks'),
-                              completed: weeklyCompleted,
-                              total: weeklyTotal,
-                              progress: weeklyProgress,
-                              activeColor: const Color(0xFF3B82F6),
-                              activeSecondaryColor: const Color(0xFFE07A48),
-                              cardBg: cardBg,
-                              textPrimary: textPrimary,
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-
-                      // MY TASKS Header
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Text(
-                          AppStrings.get('my_tasks'),
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 0.5,
-                            color: textPrimary,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-
-                      // Task Cards List
-                      if (widget.tasks.isEmpty)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 30,
-                          ),
-                          child: Center(
-                            child: Text(
-                              'No tasks yet! Click + to create one.',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: isDark
-                                    ? AppColors.textMutedDark
-                                    : AppColors.textMuted,
-                              ),
-                            ),
-                          ),
-                        )
-                      else
-                        ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          itemCount: widget.tasks.length,
-                          itemBuilder: (context, index) {
-                            final task = widget.tasks[index];
-                            return _buildTaskCard(task, cardBg, textPrimary, isDark);
-                          },
-                        ),
-                    ],
-                  ),
-                ),
-
-                // Floating Add Task '+' Button
-                Positioned(
-                  right: 20,
-                  bottom: 20,
-                  child: GestureDetector(
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => AddTaskDialog(
-                          onTaskCreated: (newTask) {
-                            widget.onTaskAdded(newTask);
-                          },
-                        ),
+                        title: _getGreetingText(name),
                       );
                     },
-                    child: Container(
-                      width: 58,
-                      height: 58,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFE07A48),
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFFE07A48).withValues(alpha: 0.4),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.add,
-                        color: Colors.white,
-                        size: 36,
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Stats Cards Row
+                  SizedBox(
+                    height: 124,
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      children: [
+                        _buildStatCard(
+                          context: context,
+                          title: AppStrings.get('today_tasks'),
+                          completed: todayCompleted,
+                          total: todayTotal,
+                          progress: todayProgress,
+                          activeColor: const Color(0xFF3B82F6),
+                          activeSecondaryColor: const Color(0xFFA855F7),
+                          cardBg: cardBg,
+                          textPrimary: textPrimary,
+                        ),
+                        const SizedBox(width: 14),
+                        _buildStatCard(
+                          context: context,
+                          title: AppStrings.get('weekly_tasks'),
+                          completed: weeklyCompleted,
+                          total: weeklyTotal,
+                          progress: weeklyProgress,
+                          activeColor: const Color(0xFF3B82F6),
+                          activeSecondaryColor: const Color(0xFFE07A48),
+                          cardBg: cardBg,
+                          textPrimary: textPrimary,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // MY TASKS Header
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Text(
+                      AppStrings.get('my_tasks'),
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 0.5,
+                        color: textPrimary,
                       ),
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 12),
+
+                  // Task Cards List
+                  if (widget.tasks.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 30,
+                      ),
+                      child: Center(
+                        child: Text(
+                          'No tasks yet! Click + to create one.',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: isDark
+                                ? AppColors.textMutedDark
+                                : AppColors.textMuted,
+                          ),
+                        ),
+                      ),
+                    )
+                  else
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      itemCount: widget.tasks.length,
+                      itemBuilder: (context, index) {
+                        final task = widget.tasks[index];
+                        return _buildTaskCard(task, cardBg, textPrimary, isDark);
+                      },
+                    ),
+                ],
+              ),
             ),
-          ),
-        );
-      },
+
+            // Floating Add Task '+' Button
+            Positioned(
+              right: 20,
+              bottom: 20,
+              child: GestureDetector(
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AddTaskDialog(
+                      onTaskCreated: (newTask) {
+                        widget.onTaskAdded(newTask);
+                      },
+                    ),
+                  );
+                },
+                child: Container(
+                  width: 58,
+                  height: 58,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE07A48),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFE07A48).withValues(alpha: 0.4),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.add,
+                    color: Colors.white,
+                    size: 36,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

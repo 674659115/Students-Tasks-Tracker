@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../localization/app_localizations.dart';
+import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_logo.dart';
 import '../widgets/auth_quick_header.dart';
@@ -19,6 +20,69 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _isLoading = false;
+
+  void _handleSignUp() async {
+    final name = _nameController.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (name.isEmpty || email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Name, Email Address, and Password are all required.'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+
+    // Name & Surname Check (at least 2 words)
+    final nameParts = name.split(RegExp(r'\s+'));
+    if (nameParts.length < 2) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter both First Name and Surname (e.g. John Doe).'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    final result = await AuthService.register(
+      name: name,
+      email: email,
+      password: password,
+    );
+
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+
+    if (result['success'] == true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Account created successfully! Welcome!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const MainNavigationScreen(),
+        ),
+        (route) => false,
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result['message'] ?? 'Registration failed.'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,10 +109,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Full Name*
+                  // Full Name* (Requires First Name & Surname)
                   CustomTextField(
                     label: AppStrings.get('full_name_required'),
-                    hintText: 'Name',
+                    hintText: 'First Name & Surname (e.g. John Doe)',
                     controller: _nameController,
                   ),
                   const SizedBox(height: 14),
@@ -56,7 +120,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   // Email Address*
                   CustomTextField(
                     label: AppStrings.get('email_address_required'),
-                    hintText: 'Email',
+                    hintText: 'Email (e.g. user@gmail.com)',
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                   ),
@@ -72,18 +136,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   const SizedBox(height: 24),
 
                   // Sign Up Button
-                  PrimaryButton(
-                    text: AppStrings.get('sign_up'),
-                    onPressed: () {
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const MainNavigationScreen(),
+                  _isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : PrimaryButton(
+                          text: AppStrings.get('sign_up'),
+                          onPressed: _handleSignUp,
                         ),
-                        (route) => false,
-                      );
-                    },
-                  ),
                   const SizedBox(height: 24),
 
                   // Sign up with Social

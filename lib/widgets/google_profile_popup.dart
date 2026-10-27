@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../localization/app_localizations.dart';
 import '../pages/settings_screen.dart';
 import '../pages/sign_in_screen.dart';
+import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
 import 'help_faqs_modal.dart';
 
@@ -23,6 +24,10 @@ class GoogleProfilePopupDialog extends StatefulWidget {
 class _GoogleProfilePopupDialogState extends State<GoogleProfilePopupDialog> {
   @override
   Widget build(BuildContext context) {
+    final user = AuthService.currentUser;
+    final userName = user?.name ?? 'Sir William';
+    final userEmail = user?.email ?? 'SirWilliam@gmail.com';
+
     return ValueListenableBuilder<String>(
       valueListenable: languageNotifier,
       builder: (context, currentLang, child) {
@@ -128,7 +133,7 @@ class _GoogleProfilePopupDialogState extends State<GoogleProfilePopupDialog> {
 
                   // User Full Name & Email
                   Text(
-                    'Sir William',
+                    userName,
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -139,7 +144,7 @@ class _GoogleProfilePopupDialogState extends State<GoogleProfilePopupDialog> {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    'SirWilliam@gmail.com',
+                    userEmail,
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
@@ -273,6 +278,7 @@ class _GoogleProfilePopupDialogState extends State<GoogleProfilePopupDialog> {
                     textColor: Colors.redAccent,
                     iconColor: Colors.redAccent,
                     onTap: () {
+                      AuthService.clearSession();
                       Navigator.pop(context);
                       Navigator.pushAndRemoveUntil(
                         context,

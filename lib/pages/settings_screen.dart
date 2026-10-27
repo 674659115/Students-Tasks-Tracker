@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../localization/app_localizations.dart';
+import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/help_faqs_modal.dart';
 import 'reset_password_screen.dart';
@@ -14,8 +15,6 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _pushNotifications = true;
-  String _userName = 'Sir William';
-  String _userEmail = 'SirWilliam@gmail.com';
 
   // Privacy toggles
   bool _locationAccess = false;
@@ -85,8 +84,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Demo Hint: Enter "password123" or any current password.',
-                    style: TextStyle(
+                    'Demo Hint: Enter "password123" or your account password.',
+                    style: const TextStyle(
                       fontSize: 11,
                       fontStyle: FontStyle.italic,
                       color: AppColors.primary,
@@ -127,8 +126,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showEditProfileDialog(bool isDark) {
-    final nameController = TextEditingController(text: _userName);
-    final emailController = TextEditingController(text: _userEmail);
+    final currentUser = AuthService.currentUser;
+    final nameController = TextEditingController(text: currentUser?.name ?? 'Sir William');
+    final emailController = TextEditingController(text: currentUser?.email ?? 'SirWilliam@gmail.com');
 
     showDialog(
       context: context,
@@ -166,14 +166,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             ElevatedButton(
               onPressed: () {
-                setState(() {
-                  _userName = nameController.text.trim().isEmpty
-                      ? _userName
-                      : nameController.text.trim();
-                  _userEmail = emailController.text.trim().isEmpty
-                      ? _userEmail
-                      : emailController.text.trim();
-                });
+                final updatedUser = UserModel(
+                  id: currentUser?.id ?? '1',
+                  name: nameController.text.trim().isEmpty
+                      ? (currentUser?.name ?? 'Sir William')
+                      : nameController.text.trim(),
+                  email: emailController.text.trim().isEmpty
+                      ? (currentUser?.email ?? 'SirWilliam@gmail.com')
+                      : emailController.text.trim(),
+                );
+                AuthService.saveSession(updatedUser);
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Profile updated successfully!')),
@@ -344,310 +346,319 @@ class _SettingsScreenState extends State<SettingsScreen> {
       builder: (context, currentLang, child) {
         final bool isDark = themeNotifier.value == ThemeMode.dark;
 
-        return Scaffold(
-          backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
-          body: SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Top Bar with Back Button
-                  Row(
+        return ValueListenableBuilder<UserModel?>(
+          valueListenable: AuthService.currentUserNotifier,
+          builder: (context, user, child) {
+            final userName = user?.name ?? 'Sir William';
+            final userEmail = user?.email ?? 'SirWilliam@gmail.com';
+
+            return Scaffold(
+              backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+              body: SafeArea(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Top Bar with Back Button
+                      Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () => Navigator.pop(context),
+                            child: Container(
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: isDark ? AppColors.cardBgDark : Colors.white,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.06),
+                                    blurRadius: 8,
+                                  ),
+                                ],
+                              ),
+                              child: Icon(
+                                Icons.arrow_back,
+                                color: isDark ? AppColors.textLight : AppColors.textDark,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Text(
+                            AppStrings.get('settings'),
+                            style: TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.w900,
+                              color: isDark ? AppColors.textLight : const Color(0xFF0F172A),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+
+                      // User Profile Info Card
                       GestureDetector(
-                        onTap: () => Navigator.pop(context),
+                        onTap: () => _showEditProfileDialog(isDark),
                         child: Container(
-                          width: 44,
-                          height: 44,
+                          padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             color: isDark ? AppColors.cardBgDark : Colors.white,
-                            shape: BoxShape.circle,
+                            borderRadius: BorderRadius.circular(24),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.06),
-                                blurRadius: 8,
+                                color: Colors.black.withValues(alpha: 0.04),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
                               ),
                             ],
                           ),
-                          child: Icon(
-                            Icons.arrow_back,
-                            color: isDark ? AppColors.textLight : AppColors.textDark,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Text(
-                        AppStrings.get('settings'),
-                        style: TextStyle(
-                          fontSize: 26,
-                          fontWeight: FontWeight.w900,
-                          color: isDark ? AppColors.textLight : const Color(0xFF0F172A),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-
-                  // User Profile Info Card
-                  GestureDetector(
-                    onTap: () => _showEditProfileDialog(isDark),
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: isDark ? AppColors.cardBgDark : Colors.white,
-                        borderRadius: BorderRadius.circular(24),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.04),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 56,
-                            height: 56,
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: AppColors.primary,
-                            ),
-                            child: const Center(
-                              child: Icon(
-                                Icons.person,
-                                color: Colors.white,
-                                size: 34,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 14),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  _userName,
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: isDark
-                                        ? AppColors.textLight
-                                        : const Color(0xFF0F172A),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 56,
+                                height: 56,
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: AppColors.primary,
+                                ),
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.person,
+                                    color: Colors.white,
+                                    size: 34,
                                   ),
                                 ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  _userEmail,
+                              ),
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      userName,
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: isDark
+                                            ? AppColors.textLight
+                                            : const Color(0xFF0F172A),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      userEmail,
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w500,
+                                        color: isDark
+                                            ? AppColors.textMutedDark
+                                            : const Color(0xFF64748B),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: isDark
+                                      ? AppColors.backgroundDark
+                                      : AppColors.background,
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: const Text(
+                                  'Edit',
                                   style: TextStyle(
                                     fontSize: 13,
-                                    fontWeight: FontWeight.w500,
-                                    color: isDark
-                                        ? AppColors.textMutedDark
-                                        : const Color(0xFF64748B),
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.primary,
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: isDark
-                                  ? AppColors.backgroundDark
-                                  : AppColors.background,
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: const Text(
-                              'Edit',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primary,
                               ),
-                            ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
+                      const SizedBox(height: 24),
 
-                  // Section 1: Account & Security
-                  _buildSectionTitle('ACCOUNT & SECURITY', isDark),
-                  const SizedBox(height: 10),
-                  _buildSettingsGroup([
-                    _buildSettingsTile(
-                      isDark: isDark,
-                      icon: Icons.lock_outline_rounded,
-                      title: AppStrings.get('change_password'),
-                      subtitle: 'Requires security password confirmation',
-                      onTap: () => _showIdentificationCheckDialog(isDark),
-                    ),
-                    _buildSettingsTile(
-                      isDark: isDark,
-                      icon: Icons.shield_outlined,
-                      title: AppStrings.get('privacy_permissions'),
-                      subtitle: 'Manage data & account privacy',
-                      onTap: () => _showPrivacyDialog(isDark),
-                    ),
-                  ], isDark),
-                  const SizedBox(height: 24),
+                      // Section 1: Account & Security
+                      _buildSectionTitle('ACCOUNT & SECURITY', isDark),
+                      const SizedBox(height: 10),
+                      _buildSettingsGroup([
+                        _buildSettingsTile(
+                          isDark: isDark,
+                          icon: Icons.lock_outline_rounded,
+                          title: AppStrings.get('change_password'),
+                          subtitle: 'Requires security password confirmation',
+                          onTap: () => _showIdentificationCheckDialog(isDark),
+                        ),
+                        _buildSettingsTile(
+                          isDark: isDark,
+                          icon: Icons.shield_outlined,
+                          title: AppStrings.get('privacy_permissions'),
+                          subtitle: 'Manage data & account privacy',
+                          onTap: () => _showPrivacyDialog(isDark),
+                        ),
+                      ], isDark),
+                      const SizedBox(height: 24),
 
-                  // Section 2: Preferences
-                  _buildSectionTitle('APP PREFERENCES', isDark),
-                  const SizedBox(height: 10),
-                  _buildSettingsGroup([
-                    _buildSettingsTile(
-                      isDark: isDark,
-                      icon: Icons.notifications_none_outlined,
-                      title: AppStrings.get('push_notifications'),
-                      subtitle: 'Deadline reminders & task alerts',
-                      trailing: Switch.adaptive(
-                        value: _pushNotifications,
-                        activeTrackColor: AppColors.primary,
-                        onChanged: (val) {
-                          setState(() {
-                            _pushNotifications = val;
-                          });
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                val
-                                    ? 'Push notifications enabled'
-                                    : 'Push notifications disabled',
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                      onTap: () {
-                        setState(() {
-                          _pushNotifications = !_pushNotifications;
-                        });
-                      },
-                    ),
-                    _buildSettingsTile(
-                      isDark: isDark,
-                      icon: Icons.dark_mode_outlined,
-                      title: AppStrings.get('dark_theme'),
-                      subtitle: 'Toggle dark mode layout',
-                      trailing: Switch.adaptive(
-                        value: isDark,
-                        activeTrackColor: AppColors.primary,
-                        onChanged: (val) {
-                          setState(() {
-                            themeNotifier.value =
-                                val ? ThemeMode.dark : ThemeMode.light;
-                          });
-                        },
-                      ),
-                      onTap: () {
-                        setState(() {
-                          themeNotifier.value =
-                              isDark ? ThemeMode.light : ThemeMode.dark;
-                        });
-                      },
-                    ),
-                    _buildSettingsTile(
-                      isDark: isDark,
-                      icon: Icons.language_outlined,
-                      title: AppStrings.get('language'),
-                      subtitle: languageNotifier.value,
-                      onTap: () => _showLanguageDialog(isDark),
-                    ),
-                  ], isDark),
-                  const SizedBox(height: 24),
-
-                  // Section 3: Help & Info
-                  _buildSectionTitle('SUPPORT & ABOUT', isDark),
-                  const SizedBox(height: 10),
-                  _buildSettingsGroup([
-                    _buildSettingsTile(
-                      isDark: isDark,
-                      icon: Icons.help_outline_rounded,
-                      title: AppStrings.get('help_faqs'),
-                      subtitle: 'Get assistance and answers',
-                      onTap: () => showHelpFaqsModal(context),
-                    ),
-                    _buildSettingsTile(
-                      isDark: isDark,
-                      icon: Icons.info_outline_rounded,
-                      title: AppStrings.get('about_app'),
-                      subtitle: 'Version 1.0.0 (Build 1)',
-                      onTap: () => _showAboutDialog(isDark),
-                    ),
-                  ], isDark),
-                  const SizedBox(height: 28),
-
-                  // Sign Out Button
-                  SizedBox(
-                    width: double.infinity,
-                    height: 52,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: Text(AppStrings.get('sign_out')),
-                              content: const Text('Are you sure you want to sign out?'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: Text(AppStrings.get('cancel')),
-                                ),
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.redAccent,
+                      // Section 2: Preferences
+                      _buildSectionTitle('APP PREFERENCES', isDark),
+                      const SizedBox(height: 10),
+                      _buildSettingsGroup([
+                        _buildSettingsTile(
+                          isDark: isDark,
+                          icon: Icons.notifications_none_outlined,
+                          title: AppStrings.get('push_notifications'),
+                          subtitle: 'Deadline reminders & task alerts',
+                          trailing: Switch.adaptive(
+                            value: _pushNotifications,
+                            activeTrackColor: AppColors.primary,
+                            onChanged: (val) {
+                              setState(() {
+                                _pushNotifications = val;
+                              });
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    val
+                                        ? 'Push notifications enabled'
+                                        : 'Push notifications disabled',
                                   ),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    Navigator.pushAndRemoveUntil(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => const SignInScreen(),
+                                ),
+                              );
+                            },
+                          ),
+                          onTap: () {
+                            setState(() {
+                              _pushNotifications = !_pushNotifications;
+                            });
+                          },
+                        ),
+                        _buildSettingsTile(
+                          isDark: isDark,
+                          icon: Icons.dark_mode_outlined,
+                          title: AppStrings.get('dark_theme'),
+                          subtitle: 'Toggle dark mode layout',
+                          trailing: Switch.adaptive(
+                            value: isDark,
+                            activeTrackColor: AppColors.primary,
+                            onChanged: (val) {
+                              setState(() {
+                                themeNotifier.value =
+                                    val ? ThemeMode.dark : ThemeMode.light;
+                              });
+                            },
+                          ),
+                          onTap: () {
+                            setState(() {
+                              themeNotifier.value =
+                                  isDark ? ThemeMode.light : ThemeMode.dark;
+                            });
+                          },
+                        ),
+                        _buildSettingsTile(
+                          isDark: isDark,
+                          icon: Icons.language_outlined,
+                          title: AppStrings.get('language'),
+                          subtitle: languageNotifier.value,
+                          onTap: () => _showLanguageDialog(isDark),
+                        ),
+                      ], isDark),
+                      const SizedBox(height: 24),
+
+                      // Section 3: Help & Info
+                      _buildSectionTitle('SUPPORT & ABOUT', isDark),
+                      const SizedBox(height: 10),
+                      _buildSettingsGroup([
+                        _buildSettingsTile(
+                          isDark: isDark,
+                          icon: Icons.help_outline_rounded,
+                          title: AppStrings.get('help_faqs'),
+                          subtitle: 'Get assistance and answers',
+                          onTap: () => showHelpFaqsModal(context),
+                        ),
+                        _buildSettingsTile(
+                          isDark: isDark,
+                          icon: Icons.info_outline_rounded,
+                          title: AppStrings.get('about_app'),
+                          subtitle: 'Version 1.0.0 (Build 1)',
+                          onTap: () => _showAboutDialog(isDark),
+                        ),
+                      ], isDark),
+                      const SizedBox(height: 28),
+
+                      // Sign Out Button
+                      SizedBox(
+                        width: double.infinity,
+                        height: 52,
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: Text(AppStrings.get('sign_out')),
+                                  content: const Text('Are you sure you want to sign out?'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      child: Text(AppStrings.get('cancel')),
+                                    ),
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.redAccent,
                                       ),
-                                      (route) => false,
-                                    );
-                                  },
-                                  child: Text(
-                                    AppStrings.get('sign_out'),
-                                    style: const TextStyle(color: Colors.white),
-                                  ),
-                                ),
-                              ],
+                                      onPressed: () {
+                                        AuthService.clearSession();
+                                        Navigator.pop(context);
+                                        Navigator.pushAndRemoveUntil(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => const SignInScreen(),
+                                          ),
+                                          (route) => false,
+                                        );
+                                      },
+                                      child: Text(
+                                        AppStrings.get('sign_out'),
+                                        style: const TextStyle(color: Colors.white),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
                             );
                           },
-                        );
-                      },
-                      icon: const Icon(Icons.logout_rounded, color: Colors.white),
-                      label: Text(
-                        AppStrings.get('sign_out'),
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          icon: const Icon(Icons.logout_rounded, color: Colors.white),
+                          label: Text(
+                            AppStrings.get('sign_out'),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.redAccent,
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(24),
+                            ),
+                          ),
                         ),
                       ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.redAccent,
-                        elevation: 2,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                      ),
-                    ),
+                      const SizedBox(height: 20),
+                    ],
                   ),
-                  const SizedBox(height: 20),
-                ],
+                ),
               ),
-            ),
-          ),
+            );
+          },
         );
       },
     );

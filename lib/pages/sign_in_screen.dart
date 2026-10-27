@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../localization/app_localizations.dart';
+import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_logo.dart';
 import '../widgets/auth_quick_header.dart';
@@ -18,9 +19,52 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
+  final _emailController = TextEditingController(text: 'SirWilliam@gmail.com');
+  final _passwordController = TextEditingController(text: 'password123');
   bool _rememberMe = false;
+  bool _isLoading = false;
+
+  void _handleSignIn() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter both Email and Password.'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    final result = await AuthService.login(
+      email: email,
+      password: password,
+    );
+
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+
+    if (result['success'] == true) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const MainNavigationScreen(),
+        ),
+        (route) => false,
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result['message'] ?? 'Invalid email or password.'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -119,18 +163,12 @@ class _SignInScreenState extends State<SignInScreen> {
                   const SizedBox(height: 24),
 
                   // Sign In Button
-                  PrimaryButton(
-                    text: AppStrings.get('sign_in'),
-                    onPressed: () {
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const MainNavigationScreen(),
+                  _isLoading
+                      ? const CircularProgressIndicator()
+                      : PrimaryButton(
+                          text: AppStrings.get('sign_in'),
+                          onPressed: _handleSignIn,
                         ),
-                        (route) => false,
-                      );
-                    },
-                  ),
                   const SizedBox(height: 28),
 
                   // Sign in with Social Row
