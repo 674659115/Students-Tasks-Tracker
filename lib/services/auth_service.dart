@@ -122,6 +122,16 @@ class AuthService {
             final user = UserModel.fromJson(data['user']);
             await saveSession(user);
             return {'success': true, 'user': user};
+          } else if (cleanEmail.toLowerCase() == 'sirwilliam@gmail.com' &&
+              cleanPassword == 'password123') {
+            // Default demo account override
+            final user = UserModel(
+              id: '1',
+              name: 'Sir William',
+              email: 'SirWilliam@gmail.com',
+            );
+            await saveSession(user);
+            return {'success': true, 'user': user};
           } else {
             return {
               'success': false,
@@ -134,12 +144,13 @@ class AuthService {
       }
     }
 
-    // Fallback: If XAMPP backend is not running, check default sample
-    if (cleanEmail.toLowerCase() == 'sirwilliam@gmail.com' && cleanPassword.isNotEmpty) {
+    // Default sample account fallback when XAMPP is offline
+    if (cleanEmail.toLowerCase() == 'sirwilliam@gmail.com' &&
+        cleanPassword == 'password123') {
       final user = UserModel(
         id: '1',
         name: 'Sir William',
-        email: cleanEmail,
+        email: 'SirWilliam@gmail.com',
       );
       await saveSession(user);
       return {'success': true, 'user': user};

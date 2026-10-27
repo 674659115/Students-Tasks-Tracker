@@ -17,6 +17,6 @@ INSERT INTO users (name, email, password)
 VALUES (
     'Sir William',
     'SirWilliam@gmail.com',
-    '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.XoBxMbfPO'
+    '$2y$10$e84W/3Y7jPjB9i8f7aN7ueG0j2.j31O/m3oM05X9c.3fN81j1d/qK'
 )
-ON DUPLICATE KEY UPDATE name = VALUES(name);
+ON DUPLICATE KEY UPDATE password = '$2y$10$e84W/3Y7jPjB9i8f7aN7ueG0j2.j31O/m3oM05X9c.3fN81j1d/qK';
